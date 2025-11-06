@@ -3,6 +3,8 @@ import logo from './assets/logo.png'
 import { useState } from 'react'
 
 function App() {
+  const [menuAbierto, setMenuAbierto] = useState(false)
+  
   // Datos de ejemplo para las próximas actividades
   const [actividades] = useState([
     {
@@ -54,20 +56,26 @@ function App() {
   }
 
   return (
-    <div className="App">
+    <div className="App" style={{ margin: 0, padding: 0 }}>
       <nav style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '1rem 2rem',
         backgroundColor: '#1e3a5f',
-        color: 'white'
+        color: 'white',
+        position: 'sticky',
+        top: 0,
+        zIndex: 1000,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <img src={logo} alt="Nahuel Trek Logo" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
-          <h2 style={{ margin: 0 }}>Nahueltrek</h2>
+          <h2 style={{ margin: 0, fontSize: 'clamp(1.2rem, 4vw, 1.5rem)' }}>Nahueltrek</h2>
         </div>
-        <ul style={{
+        
+        {/* Menú Desktop */}
+        <ul className="desktop-menu" style={{
           display: 'flex',
           listStyle: 'none',
           gap: '2rem',
@@ -75,20 +83,258 @@ function App() {
           padding: 0
         }}>
           <li><a href="#inicio" style={{ color: 'white', textDecoration: 'none' }}>Inicio</a></li>
-          <li><a href="#servicios" style={{ color: 'white', textDecoration: 'none' }}>Servicios</a></li>
-          <li><a href="#sobre-nosotros" style={{ color: 'white', textDecoration: 'none' }}>Sobre Nosotros</a></li>
+          <li><a href="#actividades" style={{ color: 'white', textDecoration: 'none' }}>Actividades</a></li>
+          <li><a href="#ndr" style={{ color: 'white', textDecoration: 'none' }}>NDR</a></li>
           <li><a href="#contacto" style={{ color: 'white', textDecoration: 'none' }}>Contacto</a></li>
         </ul>
+
+        {/* Botón Hamburguesa */}
+        <button
+          className="hamburger-menu"
+          onClick={() => setMenuAbierto(!menuAbierto)}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '50px',
+            height: '50px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: 0,
+            position: 'relative'
+          }}
+          aria-label="Menú"
+        >
+          {/* Líneas del menú hamburguesa */}
+          <div style={{
+            width: '30px',
+            height: '3px',
+            backgroundColor: 'white',
+            borderRadius: '2px',
+            transition: 'all 0.3s ease',
+            transform: menuAbierto ? 'rotate(45deg) translateY(8px)' : 'rotate(0)',
+            position: 'absolute',
+            top: menuAbierto ? '50%' : '30%'
+          }} />
+          <div style={{
+            width: '30px',
+            height: '3px',
+            backgroundColor: 'white',
+            borderRadius: '2px',
+            transition: 'all 0.3s ease',
+            opacity: menuAbierto ? 0 : 1,
+            position: 'absolute',
+            top: '50%'
+          }} />
+          <div style={{
+            width: '30px',
+            height: '3px',
+            backgroundColor: 'white',
+            borderRadius: '2px',
+            transition: 'all 0.3s ease',
+            transform: menuAbierto ? 'rotate(-45deg) translateY(-8px)' : 'rotate(0)',
+            position: 'absolute',
+            top: menuAbierto ? '50%' : '70%'
+          }} />
+          
+          {/* Decoración de montaña */}
+          {!menuAbierto && (
+            <div style={{
+              position: 'absolute',
+              bottom: '5px',
+              width: 0,
+              height: 0,
+              borderLeft: '4px solid transparent',
+              borderRight: '4px solid transparent',
+              borderBottom: '6px solid #81c784',
+              opacity: 0.7
+            }} />
+          )}
+        </button>
       </nav>
+
+      {/* Menú Mobile desplegable */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        right: menuAbierto ? 0 : '-100%',
+        width: '70%',
+        maxWidth: '300px',
+        height: '100vh',
+        backgroundColor: '#1e3a5f',
+        transition: 'right 0.4s ease',
+        zIndex: 999,
+        paddingTop: '80px',
+        boxShadow: menuAbierto ? '-4px 0 12px rgba(0,0,0,0.3)' : 'none',
+        backgroundImage: `
+          linear-gradient(135deg, transparent 0%, rgba(129, 199, 132, 0.1) 100%),
+          radial-gradient(ellipse at bottom, rgba(129, 199, 132, 0.05) 0%, transparent 50%)
+        `
+      }}>
+        {/* Decoración de montañas y araucarias */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '100px',
+          overflow: 'hidden',
+          opacity: 0.2
+        }}>
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            left: '10%',
+            width: 0,
+            height: 0,
+            borderLeft: '40px solid transparent',
+            borderRight: '40px solid transparent',
+            borderBottom: '70px solid #81c784'
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            right: '15%',
+            width: 0,
+            height: 0,
+            borderLeft: '30px solid transparent',
+            borderRight: '30px solid transparent',
+            borderBottom: '55px solid #66bb6a'
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '20px',
+            left: '50%',
+            width: '3px',
+            height: '30px',
+            backgroundColor: '#4e342e'
+          }} />
+          <div style={{
+            position: 'absolute',
+            bottom: '35px',
+            left: 'calc(50% - 8px)',
+            width: 0,
+            height: 0,
+            borderLeft: '8px solid transparent',
+            borderRight: '8px solid transparent',
+            borderBottom: '15px solid #558b2f'
+          }} />
+        </div>
+
+        <ul style={{
+          listStyle: 'none',
+          padding: '2rem',
+          margin: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '1.5rem'
+        }}>
+          <li>
+            <a 
+              href="#inicio" 
+              onClick={() => setMenuAbierto(false)}
+              style={{ 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontSize: '1.2rem',
+                display: 'block',
+                padding: '0.5rem',
+                borderLeft: '3px solid transparent',
+                transition: 'all 0.3s'
+              }}
+              onMouseOver={(e) => e.target.style.borderLeft = '3px solid #81c784'}
+              onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
+            >
+              Inicio
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#actividades" 
+              onClick={() => setMenuAbierto(false)}
+              style={{ 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontSize: '1.2rem',
+                display: 'block',
+                padding: '0.5rem',
+                borderLeft: '3px solid transparent',
+                transition: 'all 0.3s'
+              }}
+              onMouseOver={(e) => e.target.style.borderLeft = '3px solid #81c784'}
+              onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
+            >
+              Actividades
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#ndr" 
+              onClick={() => setMenuAbierto(false)}
+              style={{ 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontSize: '1.2rem',
+                display: 'block',
+                padding: '0.5rem',
+                borderLeft: '3px solid transparent',
+                transition: 'all 0.3s'
+              }}
+              onMouseOver={(e) => e.target.style.borderLeft = '3px solid #81c784'}
+              onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
+            >
+              NDR
+            </a>
+          </li>
+          <li>
+            <a 
+              href="#contacto" 
+              onClick={() => setMenuAbierto(false)}
+              style={{ 
+                color: 'white', 
+                textDecoration: 'none', 
+                fontSize: '1.2rem',
+                display: 'block',
+                padding: '0.5rem',
+                borderLeft: '3px solid transparent',
+                transition: 'all 0.3s'
+              }}
+              onMouseOver={(e) => e.target.style.borderLeft = '3px solid #81c784'}
+              onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
+            >
+              Contacto
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      {/* Overlay oscuro cuando el menú está abierto */}
+      {menuAbierto && (
+        <div 
+          onClick={() => setMenuAbierto(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 998,
+            transition: 'opacity 0.3s'
+          }}
+        />
+      )}
       
-      <div style={{ padding: '3rem 2rem', textAlign: 'center' }}>
-        <img src={logo} alt="Nahuel Trek Logo" style={{ width: '200px', marginBottom: '20px' }} />
-        <h1>Bienvenido a Nahueltrek</h1>
-        <p>Tu aventura comienza aquí</p>
+      <div id="inicio" style={{ padding: '3rem 2rem', textAlign: 'center' }}>
+        <img src={logo} alt="Nahuel Trek Logo" style={{ width: 'clamp(150px, 40vw, 200px)', marginBottom: '20px' }} />
+        <h1 style={{ fontSize: 'clamp(1.8rem, 5vw, 2.5rem)' }}>Bienvenido a Nahueltrek</h1>
+        <p style={{ fontSize: 'clamp(1rem, 3vw, 1.2rem)' }}>Tu aventura comienza aquí</p>
       </div>
 
       {/* Sección de Calendario de Actividades */}
-      <section style={{
+      <section id="actividades" style={{
         maxWidth: '1200px',
         margin: '0 auto 3rem auto',
         padding: '2rem',
@@ -194,7 +440,7 @@ function App() {
       </section>
 
       {/* Sección NDR */}
-      <section style={{
+      <section id="ndr" style={{
         maxWidth: '1000px',
         margin: '0 auto',
         padding: '2rem',
@@ -278,6 +524,17 @@ function App() {
           Protejamos y disfrutemos juntos de nuestro mundo natural.
         </p>
       </section>
+
+      {/* Footer */}
+      <footer id="contacto" style={{
+        backgroundColor: '#1e3a5f',
+        color: 'white',
+        padding: '2rem',
+        marginTop: '3rem',
+        textAlign: 'center'
+      }}>
+        <p style={{ margin: 0 }}>© 2025 Nahueltrek - Todos los derechos reservados</p>
+      </footer>
     </div>
   )
 }
