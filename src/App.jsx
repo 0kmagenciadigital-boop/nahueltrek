@@ -5,39 +5,47 @@ import { useState } from 'react'
 function App() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   
-  // Datos de ejemplo para las próximas actividades
+  // Datos de las próximas actividades
   const [actividades] = useState([
     {
       id: 1,
-      fecha: '2025-11-15',
-      titulo: 'Trekking Cerro Campanario',
-      descripcion: 'Caminata de 4 horas con vista panorámica',
-      dificultad: 'Media',
-      cupos: 12
+      fecha: '2025-11-08',
+      titulo: 'Trekking Pastos Blancos - Conguillio',
+      descripcion: '13 km (travesía)',
+      dificultad: 'Medio - Alto',
+      precio: '$55,000'
     },
     {
       id: 2,
-      fecha: '2025-11-22',
-      titulo: 'Expedición Laguna Azul',
-      descripcion: 'Travesía de día completo por paisajes únicos',
-      dificultad: 'Alta',
-      cupos: 8
+      fecha: '2025-11-09',
+      titulo: 'Trekking Sierra Nevada - Huerquehue',
+      descripcion: '12 km (ida-vuelta)',
+      dificultad: 'Medio',
+      precio: '$40,000'
     },
     {
       id: 3,
-      fecha: '2025-11-30',
-      titulo: 'Sendero Bosque Nativo',
-      descripcion: 'Caminata interpretativa de flora y fauna',
-      dificultad: 'Baja',
-      cupos: 15
+      fecha: '2025-11-15',
+      titulo: 'Trekking Volcán Sollipulli',
+      descripcion: '21 km (ida-vuelta)',
+      dificultad: 'Alto',
+      precio: '$50,000'
     },
     {
       id: 4,
-      fecha: '2025-12-06',
-      titulo: 'Trekking Refugio Frey',
-      descripcion: 'Ascenso al refugio con camping nocturno',
-      dificultad: 'Alta',
-      cupos: 10
+      fecha: '2025-11-22',
+      titulo: 'Trekking Laguna Espejo - Nahuelbuta',
+      descripcion: '16 km (ida-vuelta)',
+      dificultad: 'Medio - Alto',
+      precio: '$50,000'
+    },
+    {
+      id: 5,
+      fecha: '2025-11-23',
+      titulo: 'Trekking Cerro San Sebastián',
+      descripcion: '12 km (ida-vuelta)',
+      dificultad: 'Alto',
+      precio: '$40,000'
     }
   ])
 
@@ -48,9 +56,10 @@ function App() {
 
   const getDificultadColor = (dificultad) => {
     switch(dificultad) {
-      case 'Baja': return '#4caf50'
-      case 'Media': return '#ff9800'
-      case 'Alta': return '#f44336'
+      case 'Bajo': return '#4caf50'
+      case 'Medio': return '#ff9800'
+      case 'Medio - Alto': return '#ff6b35'
+      case 'Alto': return '#f44336'
       default: return '#757575'
     }
   }
@@ -402,15 +411,16 @@ function App() {
                       fontSize: '0.85rem',
                       fontWeight: 'bold'
                     }}>
-                      {actividad.dificultad}
+                      Nivel {actividad.dificultad}
                     </span>
                   </div>
                   
                   <div style={{ 
-                    color: '#666',
-                    fontSize: '0.9rem'
+                    color: '#1e3a5f',
+                    fontSize: '1.2rem',
+                    fontWeight: 'bold'
                   }}>
-                    👥 {actividad.cupos} cupos
+                    {actividad.precio}
                   </div>
                 </div>
                 
