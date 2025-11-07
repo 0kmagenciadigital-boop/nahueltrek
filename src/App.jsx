@@ -4,6 +4,14 @@ import { useState } from 'react'
 
 function App() {
   const [menuAbierto, setMenuAbierto] = useState(false)
+  const [formularioAbierto, setFormularioAbierto] = useState(false)
+  const [actividadSeleccionada, setActividadSeleccionada] = useState(null)
+  const [formData, setFormData] = useState({
+    nombre: '',
+    email: '',
+    telefono: '',
+    mensaje: ''
+  })
   
   // Datos de las próximas actividades
   const [actividades] = useState([
@@ -62,6 +70,59 @@ function App() {
       case 'Alto': return '#f44336'
       default: return '#757575'
     }
+  }
+
+  const abrirFormulario = (actividad) => {
+    setActividadSeleccionada(actividad)
+    setFormularioAbierto(true)
+  }
+
+  const cerrarFormulario = () => {
+    setFormularioAbierto(false)
+    setActividadSeleccionada(null)
+    setFormData({ nombre: '', email: '', telefono: '', mensaje: '' })
+  }
+
+  const handleInputChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    
+    // Construir el contenido del email
+    const subject = `Reserva: ${actividadSeleccionada.titulo}`
+    const body = `
+NUEVA RESERVA DE ACTIVIDAD
+
+Actividad: ${actividadSeleccionada.titulo}
+Fecha: ${formatearFecha(actividadSeleccionada.fecha)}
+Lugar: ${actividadSeleccionada.descripcion}
+Precio: ${actividadSeleccionada.precio}
+
+--- DATOS DEL CLIENTE ---
+
+Nombre: ${formData.nombre}
+Email: ${formData.email}
+Teléfono: ${formData.telefono}
+
+Mensaje:
+${formData.mensaje || 'Sin mensaje adicional'}
+
+---
+    `.trim()
+    
+    // Abrir cliente de correo
+    const mailtoLink = `mailto:nahueltrek@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    window.location.href = mailtoLink
+    
+    // Cerrar modal después de un pequeño delay
+    setTimeout(() => {
+      cerrarFormulario()
+    }, 500)
   }
 
   return (
@@ -424,21 +485,23 @@ function App() {
                   </div>
                 </div>
                 
-                <button style={{
-                  width: '100%',
-                  marginTop: '1rem',
-                  padding: '0.8rem',
-                  backgroundColor: '#1e3a5f',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'background-color 0.3s'
-                }}
-                onMouseOver={(e) => e.target.style.backgroundColor = '#2c5282'}
-                onMouseOut={(e) => e.target.style.backgroundColor = '#1e3a5f'}
+                <button 
+                  onClick={() => abrirFormulario(actividad)}
+                  style={{
+                    width: '100%',
+                    marginTop: '1rem',
+                    padding: '0.8rem',
+                    backgroundColor: '#1e3a5f',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '1rem',
+                    fontWeight: 'bold',
+                    cursor: 'pointer',
+                    transition: 'background-color 0.3s'
+                  }}
+                  onMouseOver={(e) => e.target.style.backgroundColor = '#2c5282'}
+                  onMouseOut={(e) => e.target.style.backgroundColor = '#1e3a5f'}
                 >
                   Reservar
                 </button>
@@ -544,6 +607,256 @@ function App() {
       }}>
         <p style={{ margin: 0 }}>© 2025 Nahueltrek - Todos los derechos reservados</p>
       </footer>
+
+      {/* Modal de Formulario de Reserva */}
+      {formularioAbierto && (
+        <>
+          <div 
+            onClick={cerrarFormulario}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100vh',
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              zIndex: 1999,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: '1rem'
+            }}
+          >
+            <div 
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                backgroundColor: 'white',
+                borderRadius: '12px',
+                padding: 'clamp(1.5rem, 4vw, 2rem)',
+                maxWidth: '500px',
+                width: '100%',
+                maxHeight: '90vh',
+                overflowY: 'auto',
+                boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+              }}
+            >
+              <div style={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                marginBottom: '1.5rem'
+              }}>
+                <h2 style={{ 
+                  color: '#1e3a5f', 
+                  margin: 0,
+                  fontSize: 'clamp(1.3rem, 4vw, 1.8rem)'
+                }}>
+                  Reservar Actividad
+                </h2>
+                <button 
+                  onClick={cerrarFormulario}
+                  style={{
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    fontSize: '2rem',
+                    cursor: 'pointer',
+                    color: '#666',
+                    padding: '0',
+                    width: '40px',
+                    height: '40px'
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+
+              {actividadSeleccionada && (
+                <div style={{
+                  backgroundColor: '#f5f5f5',
+                  padding: '1rem',
+                  borderRadius: '8px',
+                  marginBottom: '1.5rem'
+                }}>
+                  <h3 style={{ 
+                    color: '#1e3a5f', 
+                    margin: '0 0 0.5rem 0',
+                    fontSize: 'clamp(1.1rem, 3vw, 1.3rem)'
+                  }}>
+                    {actividadSeleccionada.titulo}
+                  </h3>
+                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+                    📅 {formatearFecha(actividadSeleccionada.fecha)}
+                  </p>
+                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+                    📍 {actividadSeleccionada.descripcion}
+                  </p>
+                  <p style={{ 
+                    margin: '0.3rem 0', 
+                    color: '#1e3a5f', 
+                    fontWeight: 'bold',
+                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)'
+                  }}>
+                    💰 {actividadSeleccionada.precio}
+                  </p>
+                </div>
+              )}
+
+              <form onSubmit={handleSubmit}>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    color: '#1e3a5f',
+                    fontWeight: 'bold',
+                    fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+                  }}>
+                    Nombre completo *
+                  </label>
+                  <input
+                    type="text"
+                    name="nombre"
+                    value={formData.nombre}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.8rem',
+                      border: '2px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="Tu nombre"
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    color: '#1e3a5f',
+                    fontWeight: 'bold',
+                    fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+                  }}>
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.8rem',
+                      border: '2px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="tu@email.com"
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    color: '#1e3a5f',
+                    fontWeight: 'bold',
+                    fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+                  }}>
+                    Teléfono *
+                  </label>
+                  <input
+                    type="tel"
+                    name="telefono"
+                    value={formData.telefono}
+                    onChange={handleInputChange}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '0.8rem',
+                      border: '2px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      boxSizing: 'border-box'
+                    }}
+                    placeholder="+56 9 1234 5678"
+                  />
+                </div>
+
+                <div style={{ marginBottom: '1.5rem' }}>
+                  <label style={{ 
+                    display: 'block', 
+                    marginBottom: '0.5rem', 
+                    color: '#1e3a5f',
+                    fontWeight: 'bold',
+                    fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+                  }}>
+                    Mensaje (opcional)
+                  </label>
+                  <textarea
+                    name="mensaje"
+                    value={formData.mensaje}
+                    onChange={handleInputChange}
+                    rows="4"
+                    style={{
+                      width: '100%',
+                      padding: '0.8rem',
+                      border: '2px solid #e0e0e0',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      boxSizing: 'border-box',
+                      resize: 'vertical',
+                      fontFamily: 'inherit'
+                    }}
+                    placeholder="Preguntas o comentarios adicionales..."
+                  />
+                </div>
+
+                <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={cerrarFormulario}
+                    style={{
+                      flex: '1',
+                      minWidth: '120px',
+                      padding: '0.8rem',
+                      backgroundColor: '#e0e0e0',
+                      color: '#666',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    style={{
+                      flex: '1',
+                      minWidth: '120px',
+                      padding: '0.8rem',
+                      backgroundColor: '#1e3a5f',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: 'clamp(0.9rem, 2vw, 1rem)',
+                      fontWeight: 'bold',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    Enviar Reserva
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
