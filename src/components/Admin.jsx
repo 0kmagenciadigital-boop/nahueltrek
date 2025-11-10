@@ -32,25 +32,45 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
   }
 
   const handleImagenFile = (index, file) => {
-    if (file) {
-      // Verificar tamaño del archivo (máximo 500KB)
-      if (file.size > 500000) {
-        alert('⚠️ La imagen es muy grande (máx 500KB). Por favor:\n\n1. Sube la imagen a un servicio como Imgur.com\n2. Copia la URL de la imagen\n3. Pégala en el campo de URL\n\nLas imágenes locales tienen limitaciones de almacenamiento.')
-        return
-      }
+    if (!file) return
 
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        const nuevasImagenes = [...actividadForm.imagenes]
-        nuevasImagenes[index] = reader.result
-        setActividadForm(prev => ({
-          ...prev,
-          imagenes: nuevasImagenes
-        }))
-        alert('✓ Imagen cargada temporalmente.\n\n⚠️ IMPORTANTE: Para que persista en el servidor, debes:\n1. Subir esta imagen a imgur.com o similar\n2. Reemplazar con la URL permanente')
-      }
-      reader.readAsDataURL(file)
+    // Validaciones
+    const maxSize = 2 * 1024 * 1024 // 2MB
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    
+    // Validar tipo de archivo
+    if (!allowedTypes.includes(file.type)) {
+      alert('❌ Formato no permitido\n\nFormatos aceptados: JPG, JPEG, PNG, WEBP')
+      return
     }
+
+    // Validar tamaño
+    if (file.size > maxSize) {
+      const sizeMB = (file.size / (1024 * 1024)).toFixed(2)
+      alert(`❌ Archivo muy grande (${sizeMB}MB)\n\nTamaño máximo: 2MB\n\nTip: Comprime la imagen en https://tinypng.com`)
+      return
+    }
+
+    // Convertir a base64 para vista previa y almacenamiento temporal
+    const reader = new FileReader()
+    reader.onloadend = () => {
+      const nuevasImagenes = [...actividadForm.imagenes]
+      nuevasImagenes[index] = reader.result
+      setActividadForm(prev => ({
+        ...prev,
+        imagenes: nuevasImagenes
+      }))
+      
+      // Mensaje de éxito con info
+      const sizeKB = (file.size / 1024).toFixed(0)
+      alert(`✅ Imagen cargada exitosamente\n\nArchivo: ${file.name}\nTamaño: ${sizeKB}KB\nFormato: ${file.type.split('/')[1].toUpperCase()}`)
+    }
+    
+    reader.onerror = () => {
+      alert('❌ Error al cargar la imagen\n\nIntenta nuevamente o usa una URL')
+    }
+    
+    reader.readAsDataURL(file)
   }
 
   const agregarActividad = () => {
@@ -243,30 +263,51 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
             </div>
 
             <div className="col-12">
-              <label className="form-label fw-bold mb-3" style={{ color: '#1e3a5f' }}>
-                Imágenes (mínimo 1, máximo 3)
+              <label className="form-label fw-bold mb-2" style={{ color: '#1e3a5f' }}>
+                📷 Imágenes (mínimo 1, máximo 3)
               </label>
-              <div className="alert alert-info" style={{ fontSize: '0.9rem' }}>
-                💡 <strong>Recomendación:</strong> Usa URLs de imágenes permanentes (Imgur, Unsplash, etc.) para mejor rendimiento y persistencia en el servidor.
+              
+              {/* Restricciones claramente visibles */}
+              <div className="alert alert-warning mb-3" style={{ fontSize: '0.85rem', padding: '0.75rem' }}>
+                <strong>📋 Restricciones de imágenes:</strong>
+                <ul className="mb-0 mt-2" style={{ paddingLeft: '1.2rem' }}>
+                  <li><strong>Formatos:</strong> JPG, JPEG, PNG, WEBP</li>
+                  <li><strong>Tamaño máximo:</strong> 2MB por imagen</li>
+                  <li><strong>Recomendación:</strong> 800x600px o similar</li>
+                  <li><strong>Tip:</strong> Comprime en <a href="https://tinypng.com" target="_blank" rel="noopener">tinypng.com</a> antes de subir</li>
+                </ul>
               </div>
+
               {[0, 1, 2].map(index => (
-                <div key={index} className="mb-3 p-3 border rounded-3 bg-white">
-                  <label className="form-label fw-semibold" style={{ fontSize: '0.95rem', color: '#555' }}>
-                    📷 Imagen {index + 1}
+                <div key={index} className="mb-3 p-3 border rounded-3" style={{ backgroundColor: '#f8f9fa' }}>
+                  <label className="form-label fw-semibold mb-2" style={{ fontSize: '0.95rem', color: '#1e3a5f' }}>
+                    �️ Imagen {index + 1} {index === 0 && <span className="badge bg-danger ms-2">Requerida</span>}
                   </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => handleImagenFile(index, e.target.files[0])}
-                    className="form-control mb-2"
-                    title="Carga temporal - Usa URL para permanencia"
-                  />
-                  <small className="text-muted d-block mb-2">O mejor aún, usa una URL permanente:</small>
+                  
+                  {/* Input de archivo */}
+                  <div className="mb-2">
+                    <label className="btn btn-outline-primary btn-sm w-100" style={{ cursor: 'pointer' }}>
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/jpg,image/png,image/webp"
+                        onChange={(e) => handleImagenFile(index, e.target.files[0])}
+                        style={{ display: 'none' }}
+                      />
+                      📤 Seleccionar archivo local (máx 2MB)
+                    </label>
+                  </div>
+                  
+                  {/* Separador */}
+                  <div className="text-center text-muted my-2" style={{ fontSize: '0.85rem' }}>
+                    — o —
+                  </div>
+                  
+                  {/* Input de URL */}
                   <input
                     type="url"
                     value={actividadForm.imagenes[index]}
                     onChange={(e) => handleImagenChange(index, e.target.value)}
-                    placeholder={`https://imgur.com/... o URL de imagen ${index + 1}`}
+                    placeholder="https://ejemplo.com/imagen.jpg"
                     className="form-control"
                   />
                   {actividadForm.imagenes[index] && (
