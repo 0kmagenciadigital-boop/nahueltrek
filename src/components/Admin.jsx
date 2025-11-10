@@ -31,6 +31,21 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
     }))
   }
 
+  const handleImagenFile = (index, file) => {
+    if (file) {
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        const nuevasImagenes = [...actividadForm.imagenes]
+        nuevasImagenes[index] = reader.result
+        setActividadForm(prev => ({
+          ...prev,
+          imagenes: nuevasImagenes
+        }))
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
   const agregarActividad = () => {
     if (!actividadForm.titulo || !actividadForm.fecha || !actividadForm.precio) {
       alert('Por favor completa título, fecha y precio')
@@ -75,7 +90,7 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
   }
 
   const eliminarActividad = (id) => {
-    if (confirm('¿Estás seguro de eliminar esta actividad?')) {
+    if (window.confirm('¿Estás seguro de eliminar esta actividad?')) {
       setActividades(actividades.filter(act => act.id !== id))
     }
   }
@@ -93,74 +108,49 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
   }
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100%',
-      height: '100vh',
+    <div className="position-fixed top-0 start-0 w-100 h-100 overflow-auto" style={{
       backgroundColor: 'rgba(0,0,0,0.8)',
       zIndex: 2000,
-      overflowY: 'auto',
-      padding: '2rem'
+      padding: 'clamp(1rem, 3vw, 2rem)'
     }}>
-      <div style={{
+      <div className="container" style={{
         maxWidth: '1200px',
         margin: '0 auto',
         backgroundColor: 'white',
         borderRadius: '16px',
-        padding: '2rem',
+        padding: 'clamp(1rem, 3vw, 2rem)',
         boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
       }}>
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem',
-          paddingBottom: '1rem',
-          borderBottom: '2px solid #e0e0e0'
+        {/* Header */}
+        <div className="d-flex flex-column flex-md-row justify-content-between align-items-center mb-4 pb-3" style={{
+          borderBottom: '2px solid #e0e0e0',
+          gap: '1rem'
         }}>
-          <h2 style={{ 
+          <h2 className="text-center text-md-start" style={{ 
             color: '#1e3a5f', 
             margin: 0,
-            fontSize: '2rem'
+            fontSize: 'clamp(1.5rem, 4vw, 2rem)'
           }}>
             🔧 Panel de Administración
           </h2>
-          <div style={{ display: 'flex', gap: '1rem' }}>
+          <div className="d-flex gap-2 flex-wrap justify-content-center">
             <button
               onClick={onResetear}
+              className="btn btn-warning fw-bold"
               style={{
-                backgroundColor: '#ff9800',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '0.7rem 1.5rem',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
+                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+                padding: 'clamp(0.5rem, 2vw, 0.7rem) clamp(0.8rem, 3vw, 1.5rem)'
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#f57c00'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#ff9800'}
             >
               🔄 Resetear
             </button>
             <button
               onClick={onCerrar}
+              className="btn btn-danger fw-bold"
               style={{
-                backgroundColor: '#f44336',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                padding: '0.7rem 1.5rem',
-                fontSize: '1rem',
-                fontWeight: 'bold',
-                cursor: 'pointer',
-                transition: 'all 0.3s ease'
+                fontSize: 'clamp(0.8rem, 2vw, 1rem)',
+                padding: 'clamp(0.5rem, 2vw, 0.7rem) clamp(0.8rem, 3vw, 1.5rem)'
               }}
-              onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#f44336'}
             >
               ✕ Cerrar
             </button>
@@ -168,64 +158,43 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
         </div>
 
         {/* Formulario */}
-        <div style={{
-          backgroundColor: '#f8f9fa',
-          padding: '2rem',
-          borderRadius: '12px',
-          marginBottom: '2rem'
-        }}>
-          <h3 style={{ color: '#1e3a5f', marginBottom: '1.5rem' }}>
+        <div className="bg-light rounded-3 p-3 p-md-4 mb-4">
+          <h3 className="mb-4" style={{ color: '#1e3a5f', fontSize: 'clamp(1.2rem, 3vw, 1.5rem)' }}>
             {modoEdicion ? '✏️ Editar Actividad' : '➕ Nueva Actividad'}
           </h3>
 
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
-                  Fecha *
-                </label>
-                <input
-                  type="date"
-                  name="fecha"
-                  value={actividadForm.fecha}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem',
-                    borderRadius: '8px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '1rem',
-                    boxSizing: 'border-box'
-                  }}
-                />
-              </div>
-
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
-                  Dificultad *
-                </label>
-                <select
-                  name="dificultad"
-                  value={actividadForm.dificultad}
-                  onChange={handleInputChange}
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem',
-                    borderRadius: '8px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '1rem',
-                    boxSizing: 'border-box'
-                  }}
-                >
-                  {dificultades.map(dif => (
-                    <option key={dif} value={dif}>{dif}</option>
-                  ))}
-                </select>
-              </div>
+          <div className="row g-3">
+            <div className="col-12 col-md-6">
+              <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                Fecha *
+              </label>
+              <input
+                type="date"
+                name="fecha"
+                value={actividadForm.fecha}
+                onChange={handleInputChange}
+                className="form-control"
+              />
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
+            <div className="col-12 col-md-6">
+              <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                Dificultad *
+              </label>
+              <select
+                name="dificultad"
+                value={actividadForm.dificultad}
+                onChange={handleInputChange}
+                className="form-select"
+              >
+                {dificultades.map(dif => (
+                  <option key={dif} value={dif}>{dif}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="col-12">
+              <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
                 Título *
               </label>
               <input
@@ -234,19 +203,12 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
                 value={actividadForm.titulo}
                 onChange={handleInputChange}
                 placeholder="Ej: Trekking Volcán Sollipulli"
-                style={{
-                  width: '100%',
-                  padding: '0.8rem',
-                  borderRadius: '8px',
-                  border: '2px solid #e0e0e0',
-                  fontSize: '1rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-control"
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
+            <div className="col-12">
+              <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
                 Descripción *
               </label>
               <input
@@ -255,19 +217,12 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
                 value={actividadForm.descripcion}
                 onChange={handleInputChange}
                 placeholder="Ej: 21 km (ida-vuelta)"
-                style={{
-                  width: '100%',
-                  padding: '0.8rem',
-                  borderRadius: '8px',
-                  border: '2px solid #e0e0e0',
-                  fontSize: '1rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-control"
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
+            <div className="col-12">
+              <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
                 Precio *
               </label>
               <input
@@ -276,202 +231,121 @@ function Admin({ actividades, setActividades, onCerrar, onResetear }) {
                 value={actividadForm.precio}
                 onChange={handleInputChange}
                 placeholder="Ej: $50,000"
-                style={{
-                  width: '100%',
-                  padding: '0.8rem',
-                  borderRadius: '8px',
-                  border: '2px solid #e0e0e0',
-                  fontSize: '1rem',
-                  boxSizing: 'border-box'
-                }}
+                className="form-control"
               />
             </div>
 
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold', color: '#1e3a5f' }}>
-                URLs de Imágenes (mínimo 1, máximo 3)
+            <div className="col-12">
+              <label className="form-label fw-bold mb-3" style={{ color: '#1e3a5f' }}>
+                Imágenes (mínimo 1, máximo 3)
               </label>
               {[0, 1, 2].map(index => (
-                <input
-                  key={index}
-                  type="url"
-                  value={actividadForm.imagenes[index]}
-                  onChange={(e) => handleImagenChange(index, e.target.value)}
-                  placeholder={`URL de imagen ${index + 1}`}
-                  style={{
-                    width: '100%',
-                    padding: '0.8rem',
-                    borderRadius: '8px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '1rem',
-                    marginBottom: '0.5rem',
-                    boxSizing: 'border-box'
-                  }}
-                />
+                <div key={index} className="mb-3 p-3 border rounded-3 bg-white">
+                  <label className="form-label fw-semibold" style={{ fontSize: '0.95rem', color: '#555' }}>
+                    📷 Imagen {index + 1}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleImagenFile(index, e.target.files[0])}
+                    className="form-control mb-2"
+                  />
+                  <input
+                    type="url"
+                    value={actividadForm.imagenes[index]}
+                    onChange={(e) => handleImagenChange(index, e.target.value)}
+                    placeholder={`O ingresa URL de imagen ${index + 1}`}
+                    className="form-control"
+                  />
+                  {actividadForm.imagenes[index] && (
+                    <div className="mt-2">
+                      <img
+                        src={actividadForm.imagenes[index]}
+                        alt={`Preview ${index + 1}`}
+                        style={{ maxWidth: '120px', height: 'auto', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}
+                      />
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '1rem', marginTop: '1.5rem' }}>
-            {modoEdicion ? (
-              <>
-                <button
-                  onClick={guardarEdicion}
-                  style={{
-                    flex: 1,
-                    padding: '1rem',
-                    backgroundColor: '#4caf50',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#4caf50'}
-                >
-                  💾 Guardar Cambios
-                </button>
-                <button
-                  onClick={resetForm}
-                  style={{
-                    flex: 1,
-                    padding: '1rem',
-                    backgroundColor: '#757575',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '8px',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s ease'
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#616161'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#757575'}
-                >
-                  ✕ Cancelar
-                </button>
-              </>
-            ) : (
-              <button
-                onClick={agregarActividad}
-                style={{
-                  width: '100%',
-                  padding: '1rem',
-                  background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
-                  color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  fontSize: '1rem',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  transition: 'all 0.3s ease',
-                  boxShadow: '0 4px 12px rgba(30, 58, 95, 0.3)'
-                }}
-                onMouseOver={(e) => {
-                  e.target.style.transform = 'translateY(-2px)'
-                  e.target.style.boxShadow = '0 6px 16px rgba(30, 58, 95, 0.4)'
-                }}
-                onMouseOut={(e) => {
-                  e.target.style.transform = 'translateY(0)'
-                  e.target.style.boxShadow = '0 4px 12px rgba(30, 58, 95, 0.3)'
-                }}
-              >
-                ➕ Agregar Actividad
-              </button>
-            )}
+          <div className="d-flex flex-column flex-md-row gap-2 mt-4">
+            <button
+              onClick={modoEdicion ? guardarEdicion : agregarActividad}
+              className="btn btn-success flex-fill"
+              style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)', padding: 'clamp(0.6rem, 2vw, 0.8rem)' }}
+            >
+              {modoEdicion ? '💾 Guardar Cambios' : '➕ Agregar Actividad'}
+            </button>
+            <button
+              onClick={resetForm}
+              className="btn btn-secondary flex-fill"
+              style={{ fontSize: 'clamp(0.9rem, 2vw, 1rem)', padding: 'clamp(0.6rem, 2vw, 0.8rem)' }}
+            >
+              🔄 {modoEdicion ? 'Cancelar' : 'Limpiar'}
+            </button>
           </div>
         </div>
 
         {/* Lista de Actividades */}
         <div>
-          <h3 style={{ color: '#1e3a5f', marginBottom: '1.5rem' }}>
-            📋 Actividades Actuales ({actividades.length})
+          <h3 className="mb-4" style={{ color: '#1e3a5f', fontSize: 'clamp(1.2rem, 3vw, 1.5rem)' }}>
+            📋 Actividades Registradas ({actividades.length})
           </h3>
-          
-          <div style={{ display: 'grid', gap: '1rem' }}>
-            {actividades.map(actividad => (
-              <div 
-                key={actividad.id}
-                style={{
-                  backgroundColor: 'white',
-                  border: '2px solid #e0e0e0',
-                  borderRadius: '12px',
-                  padding: '1.5rem',
-                  display: 'grid',
-                  gridTemplateColumns: '100px 1fr auto',
-                  gap: '1.5rem',
-                  alignItems: 'center',
-                  transition: 'all 0.3s ease'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)'}
-                onMouseOut={(e) => e.currentTarget.style.boxShadow = 'none'}
-              >
-                <img 
-                  src={actividad.imagenes[0]}
-                  alt={actividad.titulo}
-                  style={{
-                    width: '100px',
-                    height: '100px',
-                    objectFit: 'cover',
-                    borderRadius: '8px'
-                  }}
-                />
-                
-                <div>
-                  <h4 style={{ color: '#1e3a5f', margin: '0 0 0.5rem 0' }}>
-                    {actividad.titulo}
-                  </h4>
-                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: '0.9rem' }}>
-                    📅 {new Date(actividad.fecha + 'T00:00:00').toLocaleDateString('es-ES')}
-                  </p>
-                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: '0.9rem' }}>
-                    📍 {actividad.descripcion}
-                  </p>
-                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: '0.9rem' }}>
-                    🏔️ {actividad.dificultad} | 💰 {actividad.precio}
-                  </p>
-                </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <button
-                    onClick={() => editarActividad(actividad)}
-                    style={{
-                      padding: '0.6rem 1.2rem',
-                      backgroundColor: '#2196F3',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '0.9rem',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#1976D2'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#2196F3'}
-                  >
-                    ✏️ Editar
-                  </button>
-                  <button
-                    onClick={() => eliminarActividad(actividad.id)}
-                    style={{
-                      padding: '0.6rem 1.2rem',
-                      backgroundColor: '#f44336',
-                      color: 'white',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '0.9rem',
-                      fontWeight: 'bold',
-                      cursor: 'pointer',
-                      transition: 'all 0.3s ease'
-                    }}
-                    onMouseOver={(e) => e.target.style.backgroundColor = '#d32f2f'}
-                    onMouseOut={(e) => e.target.style.backgroundColor = '#f44336'}
-                  >
-                    🗑️ Eliminar
-                  </button>
+          <div className="row row-cols-1 row-cols-md-2 g-3">
+            {actividades.map(actividad => (
+              <div key={actividad.id} className="col">
+                <div className="card h-100 shadow-sm" style={{ borderRadius: '12px', border: '2px solid #e0e0e0', overflow: 'hidden' }}>
+                  <img
+                    src={actividad.imagenes[0]}
+                    alt={actividad.titulo}
+                    className="card-img-top"
+                    style={{ height: '180px', objectFit: 'cover' }}
+                  />
+                  <div className="card-body d-flex flex-column">
+                    <h5 className="card-title" style={{ color: '#1e3a5f', fontSize: 'clamp(1rem, 2.5vw, 1.15rem)', marginBottom: '0.8rem' }}>
+                      {actividad.titulo}
+                    </h5>
+                    <p className="card-text mb-2" style={{ fontSize: '0.9rem' }}>
+                      <strong>📅 Fecha:</strong> {new Date(actividad.fecha + 'T00:00:00').toLocaleDateString('es-CL')}
+                    </p>
+                    <p className="card-text mb-2" style={{ fontSize: '0.9rem' }}>
+                      <strong>📍 Descripción:</strong> {actividad.descripcion}
+                    </p>
+                    <p className="card-text mb-2" style={{ fontSize: '0.9rem' }}>
+                      <strong>🏔️ Dificultad:</strong> {' '}
+                      <span className={`badge bg-${
+                        actividad.dificultad === 'Bajo' ? 'success' : 
+                        actividad.dificultad === 'Medio' ? 'warning' : 
+                        actividad.dificultad === 'Medio - Alto' ? 'warning' : 
+                        'danger'
+                      }`}>
+                        {actividad.dificultad}
+                      </span>
+                    </p>
+                    <p className="card-text mb-3" style={{ fontSize: '0.95rem', fontWeight: 'bold', color: '#2d5a8f' }}>
+                      <strong>💰 Precio:</strong> {actividad.precio}
+                    </p>
+                    <div className="d-flex gap-2 mt-auto">
+                      <button
+                        onClick={() => editarActividad(actividad)}
+                        className="btn btn-primary btn-sm flex-fill"
+                        style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)' }}
+                      >
+                        ✏️ Editar
+                      </button>
+                      <button
+                        onClick={() => eliminarActividad(actividad.id)}
+                        className="btn btn-danger btn-sm flex-fill"
+                        style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)' }}
+                      >
+                        🗑️ Eliminar
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
