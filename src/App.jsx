@@ -25,11 +25,11 @@ function App() {
   const actividadesIniciales = [
     {
       id: 1,
-      fecha: '2025-11-08',
-      titulo: 'Trekking Pastos Blancos - Conguillio',
-      descripcion: '13 km (travesía)',
-      dificultad: 'Medio - Alto',
-      precio: '$55,000',
+      fecha: '2025-12-06',
+      titulo: 'Trekking PN Nahuelbuta',
+      descripcion: 'Sendero Piedra del Águila - 12 km',
+      dificultad: 'Medio',
+      precio: '$45,000',
       imagenes: [
         'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
         'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800',
@@ -38,11 +38,11 @@ function App() {
     },
     {
       id: 2,
-      fecha: '2025-11-09',
-      titulo: 'Trekking Sierra Nevada - Huerquehue',
-      descripcion: '12 km (ida-vuelta)',
-      dificultad: 'Medio',
-      precio: '$40,000',
+      fecha: '2025-12-07',
+      titulo: 'Trekking PN Conguillio',
+      descripcion: 'Volcán Llaima - 18 km (ida-vuelta)',
+      dificultad: 'Alto',
+      precio: '$55,000',
       imagenes: [
         'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
         'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
@@ -51,11 +51,11 @@ function App() {
     },
     {
       id: 3,
-      fecha: '2025-11-15',
-      titulo: 'Trekking Volcán Sollipulli',
-      descripcion: '21 km (ida-vuelta)',
-      dificultad: 'Alto',
-      precio: '$50,000',
+      fecha: '2025-12-13',
+      titulo: 'Trekking PN Nahuelbuta',
+      descripcion: 'Circuito Araucarias Milenarias - 10 km',
+      dificultad: 'Medio',
+      precio: '$45,000',
       imagenes: [
         'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800',
         'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
@@ -64,10 +64,10 @@ function App() {
     },
     {
       id: 4,
-      fecha: '2025-11-22',
-      titulo: 'Trekking Laguna Espejo - Nahuelbuta',
-      descripcion: '16 km (ida-vuelta)',
-      dificultad: 'Medio - Alto',
+      fecha: '2025-12-20',
+      titulo: 'Trekking Termas Alpehue',
+      descripcion: 'Sendero Termal - 8 km + Relax',
+      dificultad: 'Bajo',
       precio: '$50,000',
       imagenes: [
         'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
@@ -77,15 +77,54 @@ function App() {
     },
     {
       id: 5,
-      fecha: '2025-11-23',
-      titulo: 'Trekking Cerro San Sebastián',
-      descripcion: '12 km (ida-vuelta)',
-      dificultad: 'Alto',
-      precio: '$40,000',
+      fecha: '2025-12-21',
+      titulo: 'Trekking PN Tolhuaca',
+      descripcion: 'Laguna Malleco - 14 km (ida-vuelta)',
+      dificultad: 'Medio - Alto',
+      precio: '$48,000',
       imagenes: [
         'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
         'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800',
         'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800'
+      ]
+    },
+    {
+      id: 6,
+      fecha: '2025-12-26',
+      titulo: 'Trekking PN Nahuelbuta - Especial Navidad',
+      descripcion: 'Cerro Anay - 16 km (ida-vuelta)',
+      dificultad: 'Medio - Alto',
+      precio: '$52,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800'
+      ]
+    },
+    {
+      id: 7,
+      fecha: '2025-12-27',
+      titulo: 'Trekking Laguna Pirquinco',
+      descripcion: '20 km (ida-vuelta) - Aventura Total',
+      dificultad: 'Alto',
+      precio: '$58,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+        'https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800',
+        'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800'
+      ]
+    },
+    {
+      id: 8,
+      fecha: '2025-12-28',
+      titulo: 'City Tour Santiago',
+      descripcion: 'Cerro San Cristóbal + Centro Histórico',
+      dificultad: 'Bajo',
+      precio: '$35,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1570708938230-cb0b55a67e2e?w=800',
+        'https://images.unsplash.com/photo-1611348524140-53c9a25263d6?w=800',
+        'https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800'
       ]
     }
   ]
