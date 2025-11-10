@@ -1,11 +1,17 @@
 import './App.css'
 import logo from './assets/logo.png'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Admin from './components/Admin'
 
 function App() {
   const [menuAbierto, setMenuAbierto] = useState(false)
   const [formularioAbierto, setFormularioAbierto] = useState(false)
   const [actividadSeleccionada, setActividadSeleccionada] = useState(null)
+  const [carruselIndex, setCarruselIndex] = useState({})
+  const [adminAbierto, setAdminAbierto] = useState(false)
+  const [autenticado, setAutenticado] = useState(false)
+  const [mostrarLogin, setMostrarLogin] = useState(false)
+  const [passwordInput, setPasswordInput] = useState('')
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -13,15 +19,22 @@ function App() {
     mensaje: ''
   })
   
-  // Datos de las próximas actividades
-  const [actividades] = useState([
+  const PASSWORD_ADMIN = 'nahueltrek2025' // Cambiar por una contraseña segura
+  
+  // Cargar actividades desde localStorage
+  const actividadesIniciales = [
     {
       id: 1,
       fecha: '2025-11-08',
       titulo: 'Trekking Pastos Blancos - Conguillio',
       descripcion: '13 km (travesía)',
       dificultad: 'Medio - Alto',
-      precio: '$55,000'
+      precio: '$55,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800',
+        'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800'
+      ]
     },
     {
       id: 2,
@@ -29,7 +42,12 @@ function App() {
       titulo: 'Trekking Sierra Nevada - Huerquehue',
       descripcion: '12 km (ida-vuelta)',
       dificultad: 'Medio',
-      precio: '$40,000'
+      precio: '$40,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
+        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
+        'https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800'
+      ]
     },
     {
       id: 3,
@@ -37,7 +55,12 @@ function App() {
       titulo: 'Trekking Volcán Sollipulli',
       descripcion: '21 km (ida-vuelta)',
       dificultad: 'Alto',
-      precio: '$50,000'
+      precio: '$50,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800',
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
+      ]
     },
     {
       id: 4,
@@ -45,7 +68,12 @@ function App() {
       titulo: 'Trekking Laguna Espejo - Nahuelbuta',
       descripcion: '16 km (ida-vuelta)',
       dificultad: 'Medio - Alto',
-      precio: '$50,000'
+      precio: '$50,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800',
+        'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800'
+      ]
     },
     {
       id: 5,
@@ -53,9 +81,24 @@ function App() {
       titulo: 'Trekking Cerro San Sebastián',
       descripcion: '12 km (ida-vuelta)',
       dificultad: 'Alto',
-      precio: '$40,000'
+      precio: '$40,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
+        'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800',
+        'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800'
+      ]
     }
-  ])
+  ]
+
+  const [actividades, setActividades] = useState(() => {
+    const saved = localStorage.getItem('nahueltrek_actividades')
+    return saved ? JSON.parse(saved) : actividadesIniciales
+  })
+
+  // Guardar actividades en localStorage cuando cambien
+  useEffect(() => {
+    localStorage.setItem('nahueltrek_actividades', JSON.stringify(actividades))
+  }, [actividades])
 
   const formatearFecha = (fecha) => {
     const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
@@ -70,6 +113,41 @@ function App() {
       case 'Alto': return '#f44336'
       default: return '#757575'
     }
+  }
+
+  const siguienteImagen = (actividadId, totalImagenes) => {
+    setCarruselIndex(prev => ({
+      ...prev,
+      [actividadId]: ((prev[actividadId] || 0) + 1) % totalImagenes
+    }))
+  }
+
+  const anteriorImagen = (actividadId, totalImagenes) => {
+    setCarruselIndex(prev => ({
+      ...prev,
+      [actividadId]: ((prev[actividadId] || 0) - 1 + totalImagenes) % totalImagenes
+    }))
+  }
+
+  const intentarLogin = () => {
+    if (passwordInput === PASSWORD_ADMIN) {
+      setAutenticado(true)
+      setAdminAbierto(true)
+      setMostrarLogin(false)
+      setPasswordInput('')
+    } else {
+      alert('Contraseña incorrecta')
+      setPasswordInput('')
+    }
+  }
+
+  const cerrarAdmin = () => {
+    setAdminAbierto(false)
+  }
+
+  const cerrarSesion = () => {
+    setAutenticado(false)
+    setAdminAbierto(false)
   }
 
   const abrirFormulario = (actividad) => {
@@ -126,36 +204,69 @@ ${formData.mensaje || 'Sin mensaje adicional'}
   }
 
   return (
-    <div className="App" style={{ margin: 0, padding: 0 }}>
-      <nav style={{
+    <div className="App" style={{ margin: 0, padding: 0, backgroundColor: '#f8f9fa' }}>
+      <nav className="gradient-bg" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '1rem 2rem',
-        backgroundColor: '#1e3a5f',
         color: 'white',
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+        boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+        backdropFilter: 'blur(10px)'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-          <img src={logo} alt="Nahuel Trek Logo" style={{ width: '50px', height: '50px', borderRadius: '50%' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }} className="fade-in">
+          <img 
+            src={logo} 
+            alt="Nahuel Trek Logo" 
+            style={{ 
+              width: '50px', 
+              height: '50px', 
+              borderRadius: '50%',
+              boxShadow: '0 0 20px rgba(255,255,255,0.3)',
+              border: '2px solid rgba(255,255,255,0.5)'
+            }} 
+          />
         </div>
         
         {/* Menú Desktop */}
-        <ul className="desktop-menu" style={{
-          display: 'flex',
-          listStyle: 'none',
-          gap: '2rem',
-          margin: 0,
-          padding: 0
-        }}>
-          <li><a href="#inicio" style={{ color: 'white', textDecoration: 'none' }}>Inicio</a></li>
-          <li><a href="#actividades" style={{ color: 'white', textDecoration: 'none' }}>Actividades</a></li>
-          <li><a href="#ndr" style={{ color: 'white', textDecoration: 'none' }}>NDR</a></li>
-          <li><a href="#contacto" style={{ color: 'white', textDecoration: 'none' }}>Contacto</a></li>
-        </ul>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
+          <ul className="desktop-menu" style={{
+            display: 'flex',
+            listStyle: 'none',
+            gap: '2rem',
+            margin: 0,
+            padding: 0
+          }}>
+            <li><a href="#inicio" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Inicio</a></li>
+            <li><a href="#actividades" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Actividades</a></li>
+            <li><a href="#ndr" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>NDR</a></li>
+            <li><a href="#contacto" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Contacto</a></li>
+          </ul>
+
+          {/* Botón Admin */}
+          <button
+            onClick={() => autenticado ? setAdminAbierto(true) : setMostrarLogin(true)}
+            style={{
+              padding: '0.6rem 1.2rem',
+              background: autenticado ? 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' : 'rgba(255,255,255,0.2)',
+              color: 'white',
+              border: '2px solid rgba(255,255,255,0.3)',
+              borderRadius: '8px',
+              fontSize: '0.9rem',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          >
+            {autenticado ? '🔧 Admin' : '🔒 Login'}
+          </button>
+        </div>
 
         {/* Botón Hamburguesa */}
         <button
@@ -407,107 +518,242 @@ ${formData.mensaje || 'Sin mensaje adicional'}
         maxWidth: '1200px',
         margin: '0 auto 3rem auto',
         padding: '2rem',
-      }}>
-        <h2 style={{ textAlign: 'center', color: '#1e3a5f', marginBottom: '2rem' }}>
+      }} className="fade-in">
+        <h2 style={{ 
+          textAlign: 'center', 
+          fontSize: 'clamp(2rem, 5vw, 3rem)',
+          marginBottom: '3rem',
+          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}>
           📅 Próximas Actividades
         </h2>
         
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: '1.5rem'
+          gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+          gap: '2rem'
         }}>
-          {actividades.map((actividad) => (
-            <div key={actividad.id} style={{
-              backgroundColor: 'white',
-              borderRadius: '12px',
-              boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-              overflow: 'hidden',
-              transition: 'transform 0.3s ease',
-              cursor: 'pointer',
-              border: '2px solid #e0e0e0'
-            }}>
-              <div style={{
-                backgroundColor: '#1e3a5f',
-                color: 'white',
-                padding: '1rem',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>
-                  {formatearFecha(actividad.fecha)}
-                </div>
-              </div>
-              
-              <div style={{ padding: '1.5rem' }}>
-                <h3 style={{ 
-                  color: '#1e3a5f', 
-                  marginBottom: '0.5rem',
-                  fontSize: '1.3rem'
-                }}>
-                  {actividad.titulo}
-                </h3>
-                
-                <p style={{ 
-                  color: '#666', 
-                  marginBottom: '1rem',
-                  lineHeight: '1.6'
-                }}>
-                  {actividad.descripcion}
-                </p>
-                
+          {actividades.map((actividad) => {
+            const currentImageIndex = carruselIndex[actividad.id] || 0
+            
+            return (
+              <div 
+                key={actividad.id} 
+                className="card-hover"
+                style={{
+                  backgroundColor: 'white',
+                  borderRadius: '16px',
+                  boxShadow: '0 8px 16px rgba(0,0,0,0.1)',
+                  overflow: 'hidden',
+                  border: '1px solid rgba(0,0,0,0.05)'
+                }}
+              >
+                {/* Carrusel de imágenes */}
                 <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '1rem',
-                  paddingTop: '1rem',
-                  borderTop: '1px solid #e0e0e0'
+                  position: 'relative',
+                  width: '100%',
+                  height: '250px',
+                  overflow: 'hidden',
+                  backgroundColor: '#f0f0f0'
                 }}>
-                  <div>
-                    <span style={{
-                      backgroundColor: getDificultadColor(actividad.dificultad),
+                  <img 
+                    src={actividad.imagenes[currentImageIndex]}
+                    alt={actividad.titulo}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      transition: 'transform 0.3s ease'
+                    }}
+                  />
+                  
+                  {/* Controles del carrusel */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      anteriorImagen(actividad.id, actividad.imagenes.length)
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
                       color: 'white',
-                      padding: '0.3rem 0.8rem',
-                      borderRadius: '20px',
-                      fontSize: '0.85rem',
-                      fontWeight: 'bold'
-                    }}>
-                      Nivel {actividad.dificultad}
-                    </span>
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backdropFilter: 'blur(4px)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.7)'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.5)'}
+                  >
+                    ‹
+                  </button>
+                  
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      siguienteImagen(actividad.id, actividad.imagenes.length)
+                    }}
+                    style={{
+                      position: 'absolute',
+                      right: '10px',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      backgroundColor: 'rgba(0,0,0,0.5)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '50%',
+                      width: '40px',
+                      height: '40px',
+                      cursor: 'pointer',
+                      fontSize: '1.5rem',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      backdropFilter: 'blur(4px)',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.7)'}
+                    onMouseOut={(e) => e.target.style.backgroundColor = 'rgba(0,0,0,0.5)'}
+                  >
+                    ›
+                  </button>
+
+                  {/* Indicadores de imagen */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '10px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    display: 'flex',
+                    gap: '6px'
+                  }}>
+                    {actividad.imagenes.map((_, index) => (
+                      <div
+                        key={index}
+                        style={{
+                          width: '8px',
+                          height: '8px',
+                          borderRadius: '50%',
+                          backgroundColor: index === currentImageIndex ? 'white' : 'rgba(255,255,255,0.5)',
+                          transition: 'all 0.3s ease',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                        }}
+                      />
+                    ))}
                   </div>
                   
-                  <div style={{ 
-                    color: '#1e3a5f',
-                    fontSize: '1.2rem',
-                    fontWeight: 'bold'
+                  {/* Badge de fecha flotante */}
+                  <div style={{
+                    position: 'absolute',
+                    top: '15px',
+                    right: '15px',
+                    backgroundColor: 'rgba(30, 58, 95, 0.95)',
+                    color: 'white',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    fontSize: '0.85rem',
+                    fontWeight: 'bold',
+                    backdropFilter: 'blur(10px)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)'
                   }}>
-                    {actividad.precio}
+                    {new Date(actividad.fecha + 'T00:00:00').toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                   </div>
                 </div>
-                
-                <button 
-                  onClick={() => abrirFormulario(actividad)}
-                  style={{
-                    width: '100%',
+              
+                <div style={{ padding: '1.5rem' }}>
+                  <h3 style={{ 
+                    color: '#1e3a5f', 
+                    marginBottom: '0.5rem',
+                    fontSize: 'clamp(1.2rem, 3vw, 1.4rem)',
+                    fontWeight: '700'
+                  }}>
+                    {actividad.titulo}
+                  </h3>
+                  
+                  <p style={{ 
+                    color: '#666', 
+                    marginBottom: '1rem',
+                    lineHeight: '1.6',
+                    fontSize: '0.95rem'
+                  }}>
+                    📍 {actividad.descripcion}
+                  </p>
+                  
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
                     marginTop: '1rem',
-                    padding: '0.8rem',
-                    backgroundColor: '#1e3a5f',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '1rem',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                    transition: 'background-color 0.3s'
-                  }}
-                  onMouseOver={(e) => e.target.style.backgroundColor = '#2c5282'}
-                  onMouseOut={(e) => e.target.style.backgroundColor = '#1e3a5f'}
-                >
-                  Reservar
-                </button>
+                    paddingTop: '1rem',
+                    borderTop: '1px solid #e0e0e0'
+                  }}>
+                    <div>
+                      <span style={{
+                        background: `linear-gradient(135deg, ${getDificultadColor(actividad.dificultad)}, ${getDificultadColor(actividad.dificultad)}dd)`,
+                        color: 'white',
+                        padding: '0.4rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.8rem',
+                        fontWeight: 'bold',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
+                      }}>
+                        🏔️ {actividad.dificultad}
+                      </span>
+                    </div>
+                    
+                    <div style={{ 
+                      color: '#1e3a5f',
+                      fontSize: '1.4rem',
+                      fontWeight: 'bold'
+                    }}>
+                      {actividad.precio}
+                    </div>
+                  </div>
+                
+                  <button 
+                    onClick={() => abrirFormulario(actividad)}
+                    style={{
+                      width: '100%',
+                      marginTop: '1rem',
+                      padding: '0.9rem',
+                      background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '1rem',
+                      fontWeight: 'bold',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s ease',
+                      boxShadow: '0 4px 12px rgba(30, 58, 95, 0.3)'
+                    }}
+                    onMouseOver={(e) => {
+                      e.target.style.transform = 'translateY(-2px)'
+                      e.target.style.boxShadow = '0 6px 16px rgba(30, 58, 95, 0.4)'
+                    }}
+                    onMouseOut={(e) => {
+                      e.target.style.transform = 'translateY(0)'
+                      e.target.style.boxShadow = '0 4px 12px rgba(30, 58, 95, 0.3)'
+                    }}
+                  >
+                    🎒 Reservar Ahora
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </section>
 
@@ -856,6 +1102,108 @@ ${formData.mensaje || 'Sin mensaje adicional'}
             </div>
           </div>
         </>
+      )}
+
+      {/* Modal de Login Admin */}
+      {mostrarLogin && !autenticado && (
+        <div 
+          onClick={() => setMostrarLogin(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            zIndex: 1999,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '1rem'
+          }}
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '16px',
+              padding: '2rem',
+              maxWidth: '400px',
+              width: '100%',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)'
+            }}
+          >
+            <h2 style={{ 
+              color: '#1e3a5f', 
+              marginBottom: '1.5rem',
+              textAlign: 'center'
+            }}>
+              🔒 Acceso Admin
+            </h2>
+
+            <input
+              type="password"
+              placeholder="Contraseña"
+              value={passwordInput}
+              onChange={(e) => setPasswordInput(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && intentarLogin()}
+              style={{
+                width: '100%',
+                padding: '1rem',
+                border: '2px solid #e0e0e0',
+                borderRadius: '8px',
+                fontSize: '1rem',
+                marginBottom: '1rem',
+                boxSizing: 'border-box'
+              }}
+              autoFocus
+            />
+
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                onClick={() => setMostrarLogin(false)}
+                style={{
+                  flex: 1,
+                  padding: '1rem',
+                  backgroundColor: '#e0e0e0',
+                  color: '#666',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={intentarLogin}
+                style={{
+                  flex: 1,
+                  padding: '1rem',
+                  background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '1rem',
+                  fontWeight: 'bold',
+                  cursor: 'pointer'
+                }}
+              >
+                Entrar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Panel de Administración */}
+      {adminAbierto && autenticado && (
+        <Admin 
+          actividades={actividades}
+          setActividades={setActividades}
+          onCerrar={cerrarAdmin}
+        />
       )}
     </div>
   )
