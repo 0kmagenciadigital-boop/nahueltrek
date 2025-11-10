@@ -20,10 +20,90 @@ function App() {
   })
   
   const PASSWORD_ADMIN = 'nahueltrek2025' // Cambiar por una contraseña segura
-  const VERSION_ACTIVIDADES = 'v2.0' // Versión del calendario
+  const VERSION_ACTIVIDADES = 'v3.0' // Versión del calendario - Nov + Dic 2025
   
   // Cargar actividades desde localStorage
   const actividadesIniciales = [
+    // NOVIEMBRE 2025
+    {
+      id: 101,
+      fecha: '2025-11-15',
+      titulo: 'Trekking PN Nahuelbuta',
+      descripcion: 'Sendero Coihue - 9 km (ida-vuelta)',
+      dificultad: 'Medio',
+      precio: '$42,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800',
+        'https://images.unsplash.com/photo-1519904981063-b0cf448d479e?w=800'
+      ]
+    },
+    {
+      id: 102,
+      fecha: '2025-11-16',
+      titulo: 'Trekking Salto del Indio',
+      descripcion: 'Cascada + Bosque Nativo - 7 km',
+      dificultad: 'Bajo',
+      precio: '$38,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+        'https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=800',
+        'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800'
+      ]
+    },
+    {
+      id: 103,
+      fecha: '2025-11-22',
+      titulo: 'Trekking PN Conguillio',
+      descripcion: 'Laguna Arcoiris - 12 km (ida-vuelta)',
+      dificultad: 'Medio',
+      precio: '$47,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1551632811-561732d1e306?w=800',
+        'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800',
+        'https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800'
+      ]
+    },
+    {
+      id: 104,
+      fecha: '2025-11-23',
+      titulo: 'Trekking PN Tolhuaca',
+      descripcion: 'Sendero Salto Malleco - 10 km',
+      dificultad: 'Medio',
+      precio: '$45,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800',
+        'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800',
+        'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?w=800'
+      ]
+    },
+    {
+      id: 105,
+      fecha: '2025-11-29',
+      titulo: 'Trekking Laguna Pirquinco',
+      descripcion: '16 km (ida-vuelta) - Aventura',
+      dificultad: 'Medio - Alto',
+      precio: '$52,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800',
+        'https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800',
+        'https://images.unsplash.com/photo-1454496522488-7a8e488e8606?w=800'
+      ]
+    },
+    {
+      id: 106,
+      fecha: '2025-11-30',
+      titulo: 'Trekking Termas Alpehue',
+      descripcion: 'Sendero Termal - 8 km + Relax',
+      dificultad: 'Bajo',
+      precio: '$48,000',
+      imagenes: [
+        'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800',
+        'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800',
+        'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?w=800'
+      ]
+    },
+    // DICIEMBRE 2025
     {
       id: 1,
       fecha: '2025-12-06',
@@ -200,11 +280,34 @@ function App() {
   }
 
   const resetearActividades = () => {
-    if (confirm('¿Estás seguro de resetear las actividades a las predeterminadas de diciembre?')) {
+    if (confirm('¿Estás seguro de resetear las actividades a las predeterminadas?')) {
       localStorage.removeItem('nahueltrek_actividades')
       setActividades(actividadesIniciales)
       alert('Actividades reseteadas exitosamente')
     }
+  }
+
+  // Agrupar actividades por mes
+  const agruparPorMes = () => {
+    const meses = {}
+    actividades.forEach(actividad => {
+      const fecha = new Date(actividad.fecha + 'T00:00:00')
+      const mesAnio = fecha.toLocaleDateString('es-ES', { month: 'long', year: 'numeric' })
+      const mesKey = `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, '0')}`
+      
+      if (!meses[mesKey]) {
+        meses[mesKey] = {
+          nombre: mesAnio.charAt(0).toUpperCase() + mesAnio.slice(1),
+          actividades: []
+        }
+      }
+      meses[mesKey].actividades.push(actividad)
+    })
+    
+    // Ordenar por fecha (mes)
+    return Object.entries(meses)
+      .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+      .map(([key, value]) => value)
   }
 
   const abrirFormulario = (actividad) => {
@@ -581,8 +684,20 @@ ${formData.mensaje || 'Sin mensaje adicional'}
             📅 Próximas Actividades
           </h2>
           
-          <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            {actividades.map((actividad) => {
+          {agruparPorMes().map((grupo, idx) => (
+            <div key={idx} className="mb-5">
+              <h3 className="mb-4 pb-2" style={{
+                fontSize: 'clamp(1.5rem, 4vw, 2rem)',
+                color: '#1e3a5f',
+                borderBottom: '3px solid #ff9800',
+                display: 'inline-block',
+                paddingBottom: '0.5rem'
+              }}>
+                {grupo.nombre}
+              </h3>
+              
+              <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {grupo.actividades.map((actividad) => {
               const currentImageIndex = carruselIndex[actividad.id] || 0
               
               return (
@@ -801,6 +916,8 @@ ${formData.mensaje || 'Sin mensaje adicional'}
             )
           })}
           </div>
+            </div>
+          ))}
         </div>
       </section>
 
