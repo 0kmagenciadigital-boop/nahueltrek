@@ -1,17 +1,172 @@
 [
     {
-        "id": 1763297950743,
-        "titulo": "Parque Nacional Nahuelbuta",
-        "descripcion": "Hotspot Bio diersidad",
-        "ubicacion": "Region Araucana",
-        "contenido": "",
+        "id": 1,
+        "titulo": "Parque Nacional Conguillío",
+        "descripcion": "Uno de los parques más hermosos de Chile, conocido por sus araucarias milenarias y el impresionante volcán Llaima",
+        "ubicacion": "Melipeuco, Región de La Araucanía",
+        "contenido": "El Parque Nacional Conguillío es un tesoro natural de 60.832 hectáreas que alberga bosques de araucarias milenarias, lagunas cristalinas y paisajes volcánicos únicos. Su nombre significa 'entre aguas' en mapudungun. Destacan la Laguna Arcoíris, el volcán Llaima (uno de los más activos de Chile), y la Laguna Conguillío. Ideal para trekking, fotografía, observación de flora y fauna nativa. Los senderos más populares son: Sierra Nevada (12 km), Los Carpinteros (1 km), y Laguna Captrén (9 km).",
+        "categoria": "naturaleza",
+        "destacado": true,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://images.unsplash.com/photo-1511593358241-7eea1f3c84e5?w=800",
+            "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T14:00:00.000Z",
+        "lat": -38.6456,
+        "lng": -71.6319
+    },
+    {
+        "id": 2,
+        "titulo": "Volcán Villarrica",
+        "descripcion": "El volcán más activo de Sudamérica con un lago de lava permanente en su cráter",
+        "ubicacion": "Pucón, Región de La Araucanía",
+        "contenido": "El Villarrica es uno de los volcanes más icónicos de Chile, con 2.847 metros de altura. Su ascenso es una experiencia única que combina trekking sobre nieve, crampones y hielo, culminando con la vista del lago de lava incandescente en el cráter. La ascensión toma entre 6-8 horas (ida y vuelta) y requiere buena condición física. La bajada se realiza deslizándose por canales de nieve, agregando diversión a la aventura. Desde la cumbre se aprecian vistas 360° de la cordillera, lagos Villarrica y Caburga, y otros volcanes. Temporada recomendada: noviembre a marzo.",
+        "categoria": "escalada",
+        "destacado": true,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800",
+            "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T14:10:00.000Z",
+        "lat": -39.4204,
+        "lng": -71.9331
+    },
+    {
+        "id": 3,
+        "titulo": "Parque Nacional Huerquehue",
+        "descripcion": "Bosques de araucarias, lagos esmeralda y senderos mágicos en plena cordillera",
+        "ubicacion": "Pucón, Región de La Araucanía",
+        "contenido": "Huerquehue es un parque nacional de 12.500 hectáreas famoso por su increíble belleza escénica y biodiversidad. El sendero más popular es el Lago Los Patos - Lago Chico - Lago El Toro (12 km ida y vuelta, 4-5 horas), que atraviesa densos bosques de coigües, lengas y araucarias, llegando a tres lagos de aguas cristalinas color esmeralda. El parque también alberga el mirador Los Patos con vistas al valle. Flora destacada: copihues, araucarias, coigües. Fauna: pudúes, zorros, cóndores, carpinteros negros. Apto para familias con buen estado físico. Infraestructura: camping, guardaparques, baños.",
+        "categoria": "trekking",
+        "destacado": true,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T14:20:00.000Z",
+        "lat": -39.1586,
+        "lng": -71.7333
+    },
+    {
+        "id": 4,
+        "titulo": "Ojos del Caburga",
+        "descripcion": "Pozones de agua turquesa alimentados por vertientes subterráneas",
+        "ubicacion": "Caburga, Pucón, Región de La Araucanía",
+        "contenido": "Los Ojos del Caburga son una maravilla natural compuesta por varios pozones de agua cristalina color turquesa, alimentados por vertientes subterráneas que emergen desde el Lago Caburga. El agua mantiene una temperatura constante de 8-10°C durante todo el año. El lugar cuenta con pasarelas de madera que permiten recorrer los pozones entre la vegetación nativa. Es un lugar perfecto para fotografía, picnic familiar y conectar con la naturaleza. La caminata desde el estacionamiento es corta (15 minutos) y accesible para todas las edades. En verano es posible bañarse en algunas pozas. Servicios: estacionamiento ($3.000), baños, área de picnic.",
         "categoria": "naturaleza",
         "destacado": false,
         "imagenes": [
-            "http:\/\/localhost:8000\/uploads\/nahueltrek_6919cb8db134e5.02351329.jpg",
-            "http:\/\/localhost:8000\/uploads\/nahueltrek_6919cb916cd743.23783877.jpg",
-            "http:\/\/localhost:8000\/uploads\/nahueltrek_6919cb944b61b2.20480756.jfif"
+            "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800",
+            "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800",
+            "https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=800"
         ],
-        "fechaPublicacion": "2025-11-16T12:59:10.743Z"
+        "fechaPublicacion": "2025-11-16T14:30:00.000Z",
+        "lat": -39.1778,
+        "lng": -71.7861
+    },
+    {
+        "id": 5,
+        "titulo": "Parque Nacional Nahuelbuta",
+        "descripcion": "Araucarias centenarias y vistas panorámicas del Pacífico y Los Andes",
+        "ubicacion": "Angol, Región de La Araucanía",
+        "contenido": "Nahuelbuta es un hotspot de biodiversidad con 6.832 hectáreas de bosque nativo. Es uno de los pocos lugares donde pueden verse simultáneamente el Océano Pacífico y la Cordillera de Los Andes desde la Piedra del Águila (1.400 msnm). El parque protege los últimos bosques de araucarias costeras, algunas con más de 2.000 años de antigüedad. Senderos destacados: Piedra del Águila (6 km, 3 horas), Los Nirres (800m, 30 min), Pehuenco (5 km, 2 horas). Fauna: pudú, monito del monte, puma (difícil de avistar), carpintero negro. Camping Pehuenco disponible. Mejor época: diciembre a marzo. Ubicación única: zona costera de la Cordillera de Nahuelbuta.",
+        "categoria": "naturaleza",
+        "destacado": true,
+        "imagenes": [
+            "http://localhost:8000/uploads/nahueltrek_6919cb8db134e5.02351329.jpg",
+            "http://localhost:8000/uploads/nahueltrek_6919cb916cd743.23783877.jpg",
+            "http://localhost:8000/uploads/nahueltrek_6919cb944b61b2.20480756.jfif"
+        ],
+        "fechaPublicacion": "2025-11-16T12:59:10.743Z",
+        "lat": -37.8086,
+        "lng": -73.0031
+    },
+    {
+        "id": 6,
+        "titulo": "Termas Geométricas",
+        "descripcion": "17 piscinas termales escondidas en un cañón de bosque nativo",
+        "ubicacion": "Coñaripe, Región de La Araucanía",
+        "contenido": "Las Termas Geométricas son un complejo termal único en el mundo, diseñado por el arquitecto Germán del Sol. 17 pozones de agua caliente (35-45°C) se esconden en un estrecho cañón de bosque nativo, conectados por pasarelas de madera roja que serpentean entre la vegetación. El diseño minimalista y la arquitectura armoniosa con la naturaleza crean una experiencia casi mágica. Las aguas tienen propiedades medicinales para piel, articulaciones y relajación muscular. Horario: 10:00-21:00hrs. Entrada: $25.000 adultos. Incluye toalla. No se permiten niños menores de 6 años. Servicios: cafetería, vestidores, casilleros. Reserva recomendada en temporada alta.",
+        "categoria": "aventura",
+        "destacado": false,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800",
+            "https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=800",
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T14:40:00.000Z",
+        "lat": -39.5631,
+        "lng": -71.8967
+    },
+    {
+        "id": 7,
+        "titulo": "Lago Caburga",
+        "descripcion": "Playa de aguas turquesas rodeada de bosque nativo y playas de arena negra",
+        "ubicacion": "Caburga, Pucón, Región de La Araucanía",
+        "contenido": "El Lago Caburga es un hermoso lago de origen glaciar con aguas color turquesa intenso, playas de arena volcánica negra y bosques de araucarias en sus orillas. Perfecto para kayak, paddle board, natación (en verano), pesca deportiva y picnics familiares. La playa principal cuenta con servicios de alquiler de kayaks, restaurant, camping y cabañas. El lago tiene una superficie de 51 km² y profundidad máxima de 107 metros. Temperatura del agua en verano: 18-22°C. Circuito recomendado: recorrer la orilla sur hasta la playa Los Cisnes (12 km). Actividades adicionales: visitar Ojos del Caburga cercano, trekking al mirador del lago, pesca de truchas.",
+        "categoria": "aventura",
+        "destacado": false,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1501594907352-04cda38ebc29?w=800",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T14:50:00.000Z",
+        "lat": -39.1833,
+        "lng": -71.7833
+    },
+    {
+        "id": 8,
+        "titulo": "Saltos del Huilo Huilo",
+        "descripcion": "Cascadas espectaculares en la selva valdiviana",
+        "ubicacion": "Huilo Huilo, Panguipulli, Región de La Araucanía",
+        "contenido": "La Reserva Biológica Huilo Huilo protege 100.000 hectáreas de selva valdiviana y alberga algunas de las cascadas más impresionantes de Chile. Destacan: Salto del Huilo Huilo (70 metros de caída libre con pasarela bajo la cascada), Salto del Puma, y Salto El Trueno. Los senderos están muy bien mantenidos con miradores estratégicos. Flora: bosque de coigües, ulmos, tepas, helechos gigantes. Fauna: pudúes, huemules, pumas, martín pescador. Infraestructura premium: hotel boutique, spa, museo de huemul, cervecería artesanal. Entrada: $15.000 adultos. Circuito completo: 4-5 horas. Ideal para familias. Mejor época: octubre a abril (evitar invierno por lluvias).",
+        "categoria": "naturaleza",
+        "destacado": false,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1432405972618-c60b0225b8f9?w=800",
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T15:00:00.000Z",
+        "lat": -39.7569,
+        "lng": -71.8167
+    },
+    {
+        "id": 9,
+        "titulo": "Centro de Esquí Corralco",
+        "descripcion": "Ski & snowboard en el volcán Lonquimay con bosques de araucarias",
+        "ubicacion": "Malalcahuello, Región de La Araucanía",
+        "contenido": "Corralco es un centro de esquí boutique ubicado en las faldas del volcán Lonquimay (2.865 msnm), rodeado de bosques de araucarias milenarias. Ofrece 32 pistas para todos los niveles (principiantes a expertos), 9 medios de elevación, y nieve de excelente calidad por su ubicación cordillerana. Destacan las pistas fuera de pista y el terreno para freeride. Temporada: junio a octubre. Base: 1.450 msnm, cumbre: 2.200 msnm. Precipitaciones anuales de nieve: 4-6 metros. Servicios: escuela de ski, alquiler de equipos, cafetería, restaurant, hotel Corralco. Verano: mountain bike, trekking, cabalgatas. Vistas espectaculares del volcán Lonquimay y las araucarias nevadas.",
+        "categoria": "aventura",
+        "destacado": false,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1605540436563-5bca919ae766?w=800",
+            "https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=800",
+            "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T15:10:00.000Z",
+        "lat": -38.4072,
+        "lng": -71.4122
+    },
+    {
+        "id": 10,
+        "titulo": "Laguna Arcoíris",
+        "descripcion": "Laguna de colores cambiantes rodeada de araucarias en Conguillío",
+        "ubicacion": "Parque Nacional Conguillío, Región de La Araucanía",
+        "contenido": "La Laguna Arcoíris es una de las joyas del Parque Nacional Conguillío. Su nombre se debe a los múltiples colores que reflejan sus aguas según la luz del día y las estaciones: turquesa, verde esmeralda, azul profundo. Está rodeada por bosques de araucarias centenarias y ofrece vistas al volcán Llaima. Sendero de acceso: 4 km (2 horas ida y vuelta), dificultad media. La playa de la laguna es perfecta para descansar y observar la naturaleza. Actividades: fotografía paisajística, observación de aves (patos, taguas, martín pescador), picnic. Mejor luz: atardecer (17-19hrs en verano). Combinable con sendero Sierra Nevada para un día completo. Prohibido nadar (agua muy fría, 8-10°C).",
+        "categoria": "trekking",
+        "destacado": false,
+        "imagenes": [
+            "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800",
+            "https://images.unsplash.com/photo-1439066615861-d1af74d74000?w=800",
+            "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800"
+        ],
+        "fechaPublicacion": "2025-11-16T15:20:00.000Z",
+        "lat": -38.6528,
+        "lng": -71.6447
     }
 ]
