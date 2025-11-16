@@ -229,41 +229,8 @@ function App() {
     }
   ]
 
-  const [actividades, setActividades] = useState([])
-  const [cargando, setCargando] = useState(true)
-  const [inicializado, setInicializado] = useState(false)
-
-  // Cargar actividades
-  useEffect(() => {
-    const cargarActividades = async () => {
-      try {
-        // Intentar cargar desde localStorage primero
-        const actividadesGuardadas = localStorage.getItem('actividades')
-        if (actividadesGuardadas) {
-          console.log('✅ Cargando actividades desde localStorage')
-          const data = JSON.parse(actividadesGuardadas)
-          setActividades(data)
-        } else {
-          console.log('✅ Cargando actividades iniciales')
-          setActividades(actividadesIniciales)
-          localStorage.setItem('actividades', JSON.stringify(actividadesIniciales))
-        }
-      } catch (error) {
-        console.error('❌ Error al cargar actividades:', error)
-        setActividades(actividadesIniciales)
-      } finally {
-        setCargando(false)
-        setInicializado(true)
-      }
-      
-      // Nota: En producción con Google Sheets, aquí se cargaría desde Sheets
-      // const sheetsService = new SheetsService()
-      // const data = await sheetsService.getActividades()
-      // setActividades(data)
-    }
-    
-    cargarActividades()
-  }, [])
+  const [actividades, setActividades] = useState(actividadesIniciales)
+  const [cargando, setCargando] = useState(false)
 
   // Cargar lugares desde JSON local o localStorage
   useEffect(() => {
@@ -346,14 +313,13 @@ function App() {
 
   // Guardar actividades
   useEffect(() => {
-    if (inicializado && actividades.length > 0) {
-      console.log('💾 Guardando actividades en localStorage:', actividades.length)
-      localStorage.setItem('actividades', JSON.stringify(actividades))
+    if (actividades.length > 0) {
+      console.log('💾 Actividades actualizadas en memoria:', actividades.length)
       // En producción con Google Sheets:
       // const sheetsService = new SheetsService()
       // await sheetsService.updateActividades(actividades)
     }
-  }, [actividades, inicializado])
+  }, [actividades])
 
   const formatearFecha = (fecha) => {
     const opciones = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
