@@ -1376,34 +1376,82 @@ ${formData.mensaje || 'Sin mensaje adicional'}
               </div>
 
               {actividadSeleccionada && (
-                <div style={{
-                  backgroundColor: '#f5f5f5',
-                  padding: '1rem',
-                  borderRadius: '8px',
-                  marginBottom: '1.5rem'
-                }}>
-                  <h3 style={{ 
-                    color: '#1e3a5f', 
-                    margin: '0 0 0.5rem 0',
-                    fontSize: 'clamp(1.1rem, 3vw, 1.3rem)'
+                <>
+                  <div style={{
+                    backgroundColor: '#f5f5f5',
+                    padding: '1rem',
+                    borderRadius: '8px',
+                    marginBottom: '1rem'
                   }}>
-                    {actividadSeleccionada.titulo}
-                  </h3>
-                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
-                    📅 {formatearFecha(actividadSeleccionada.fecha)}
-                  </p>
-                  <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
-                    📍 {actividadSeleccionada.descripcion}
-                  </p>
-                  <p style={{ 
-                    margin: '0.3rem 0', 
-                    color: '#1e3a5f', 
-                    fontWeight: 'bold',
-                    fontSize: 'clamp(1rem, 2.5vw, 1.2rem)'
+                    <h3 style={{ 
+                      color: '#1e3a5f', 
+                      margin: '0 0 0.5rem 0',
+                      fontSize: 'clamp(1.1rem, 3vw, 1.3rem)'
+                    }}>
+                      {actividadSeleccionada.titulo}
+                    </h3>
+                    <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+                      📅 {formatearFecha(actividadSeleccionada.fecha)}
+                    </p>
+                    <p style={{ margin: '0.3rem 0', color: '#666', fontSize: 'clamp(0.9rem, 2vw, 1rem)' }}>
+                      📍 {actividadSeleccionada.descripcion}
+                    </p>
+                    <p style={{ 
+                      margin: '0.3rem 0', 
+                      color: '#1e3a5f', 
+                      fontWeight: 'bold',
+                      fontSize: 'clamp(1rem, 2.5vw, 1.2rem)'
+                    }}>
+                      💰 {actividadSeleccionada.precio}
+                    </p>
+                  </div>
+
+                  {/* Botón de Reserva con Google Forms */}
+                  {import.meta.env.VITE_GOOGLE_FORM_URL && (
+                    <button
+                      onClick={() => {
+                        const formUrl = new URL(import.meta.env.VITE_GOOGLE_FORM_URL)
+                        // Pre-llenar el campo de actividad (ajustar entry.XXXXX según tu formulario)
+                        formUrl.searchParams.set('entry.1234567890', actividadSeleccionada.titulo)
+                        window.open(formUrl.toString(), '_blank')
+                      }}
+                      style={{
+                        width: '100%',
+                        padding: '1rem',
+                        backgroundColor: '#4285f4',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: 'clamp(1rem, 2.5vw, 1.1rem)',
+                        fontWeight: 'bold',
+                        cursor: 'pointer',
+                        marginBottom: '1.5rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '0.5rem',
+                        transition: 'background-color 0.3s'
+                      }}
+                      onMouseEnter={(e) => e.target.style.backgroundColor = '#3367d6'}
+                      onMouseLeave={(e) => e.target.style.backgroundColor = '#4285f4'}
+                    >
+                      🎫 Reservar con Google Forms
+                    </button>
+                  )}
+
+                  {/* Divider */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    margin: '1.5rem 0',
+                    color: '#999',
+                    fontSize: '0.9rem'
                   }}>
-                    💰 {actividadSeleccionada.precio}
-                  </p>
-                </div>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: '#ddd' }} />
+                    <span style={{ padding: '0 1rem' }}>o contacta por email</span>
+                    <div style={{ flex: 1, height: '1px', backgroundColor: '#ddd' }} />
+                  </div>
+                </>
               )}
 
               <form onSubmit={handleSubmit}>
