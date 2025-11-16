@@ -2,7 +2,8 @@ import './App.css'
 import logo from './assets/logo.png'
 import { useState, useEffect } from 'react'
 import Admin from './components/Admin'
-import BlogLugares from './components/BlogLugares'
+import Reservas from './components/Reservas'
+import Destinos from './components/Destinos'
 
 // Importar imágenes NDR
 import ndr1 from '../img/025ebb3e-a026-4ff8-b944-4460656eb26e.jfif'
@@ -20,12 +21,15 @@ function App() {
   const [carruselIndex, setCarruselIndex] = useState({})
   const [imagenesVersion, setImagenesVersion] = useState(0) // Para forzar recarga de imágenes
   const [adminAbierto, setAdminAbierto] = useState(false)
-  const [blogAbierto, setBlogAbierto] = useState(false)
+  const [reservasAbierto, setReservasAbierto] = useState(false)
+  const [destinosAbierto, setDestinosAbierto] = useState(false)
+  const [mostrarModalContacto, setMostrarModalContacto] = useState(false)
   const [autenticado, setAutenticado] = useState(false)
   const [mostrarLogin, setMostrarLogin] = useState(false)
   const [passwordInput, setPasswordInput] = useState('')
   const [lugares, setLugares] = useState([])
   const [cargandoLugares, setCargandoLugares] = useState(true)
+  const [reservas, setReservas] = useState([])
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -228,47 +232,49 @@ function App() {
   const [actividades, setActividades] = useState(actividadesIniciales)
   const [cargando, setCargando] = useState(true)
 
-  // Cargar actividades desde el servidor al iniciar
+  // Cargar actividades
   useEffect(() => {
     const cargarActividades = async () => {
-      try {
-        const response = await fetch('/api/actividades.php')
-        if (response.ok) {
-          const data = await response.json()
-          if (data && data.length > 0) {
-            console.log('✅ Actividades cargadas desde servidor:', data.length)
-            setActividades(data)
-          } else {
-            console.log('ℹ️ Servidor vacío, usando datos iniciales')
-            // Si el servidor está vacío, guardar los datos iniciales
-            await guardarEnServidor(actividadesIniciales)
-          }
-        } else {
-          console.log('⚠️ Error al cargar desde servidor, usando datos iniciales')
-        }
-      } catch (error) {
-        console.error('❌ Error de conexión:', error)
-        console.log('ℹ️ Usando datos iniciales')
-      } finally {
-        setCargando(false)
-      }
+      console.log('✅ Cargando actividades')
+      setActividades(actividadesIniciales)
+      setCargando(false)
+      
+      // Nota: En producción con Google Sheets, aquí se cargaría desde Sheets
+      // const sheetsService = new SheetsService()
+      // const data = await sheetsService.getActividades()
+      // setActividades(data)
     }
     
     cargarActividades()
   }, [])
 
-  // Cargar lugares desde el servidor al iniciar
+  // Cargar lugares desde JSON local o localStorage
   useEffect(() => {
     const cargarLugares = async () => {
       try {
-        const response = await fetch('http://localhost:8000/api/lugares.php')
-        if (response.ok) {
-          const data = await response.json()
-          console.log('✅ Lugares cargados desde servidor:', data.length)
-          setLugares(data || [])
+        // Intentar cargar desde localStorage primero
+        const lugaresGuardados = localStorage.getItem('lugares')
+        if (lugaresGuardados) {
+          console.log('📍 Cargando lugares desde localStorage...')
+          const data = JSON.parse(lugaresGuardados)
+          console.log('✅ Lugares cargados desde localStorage:', data.length)
+          setLugares(data)
+        } else {
+          console.log('📍 Cargando lugares desde JSON local...')
+          const lugaresLocal = await import('../data/lugares.json')
+          const data = lugaresLocal.default || []
+          console.log('✅ Lugares cargados:', data.length)
+          setLugares(data)
+          localStorage.setItem('lugares', JSON.stringify(data))
         }
+        
+        // Nota: En producción con Google Sheets, usar:
+        // const sheetsService = new SheetsService()
+        // const data = await sheetsService.getLugares()
+        // setLugares(data)
       } catch (error) {
         console.error('❌ Error al cargar lugares:', error)
+        setLugares([])
       } finally {
         setCargandoLugares(false)
       }
@@ -277,36 +283,57 @@ function App() {
     cargarLugares()
   }, [])
 
-  // Función para guardar en el servidor
-  const guardarEnServidor = async (nuevasActividades) => {
-    try {
-      const response = await fetch('/api/actividades.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(nuevasActividades)
-      })
-      
-      if (response.ok) {
-        const result = await response.json()
-        console.log('✅ Guardado en servidor:', result)
-        return true
-      } else {
-        console.error('❌ Error al guardar en servidor')
-        return false
+  // Cargar reservas desde JSON local
+  useEffect(() => {
+    const cargarReservas = async () => {
+      try {
+        console.log('📅 Cargando reservas desde JSON local...')
+        const reservasLocal = await import('../data/reservas.json')
+        const data = reservasLocal.default || []
+        console.log('✅ Reservas cargadas:', data.length)
+        setReservas(data)
+        
+        // Nota: En producción con Google Sheets, usar:
+        // const sheetsService = new SheetsService()
+        // const data = await sheetsService.getReservas()
+        // setReservas(data)
+      } catch (error) {
+        console.error('❌ Error al cargar reservas:', error)
+        setReservas([])
       }
-    } catch (error) {
-      console.error('❌ Error de conexión al guardar:', error)
-      return false
     }
-  }
+    
+    cargarReservas()
+  }, [])
 
-  // Guardar actividades en el servidor cuando cambien
+  // Guardar reservas cuando cambien
+  useEffect(() => {
+    if (reservas.length > 0) {
+      console.log('💾 Reservas actualizadas en memoria:', reservas.length)
+      // En producción con Google Sheets:
+      // const sheetsService = new SheetsService()
+      // await sheetsService.updateReservas(reservas)
+    }
+  }, [reservas])
+
+  // Guardar lugares cuando cambien
+  useEffect(() => {
+    if (lugares.length > 0) {
+      console.log('💾 Lugares actualizados en memoria:', lugares.length)
+      localStorage.setItem('lugares', JSON.stringify(lugares))
+      // En producción con Google Sheets:
+      // const sheetsService = new SheetsService()
+      // await sheetsService.updateLugares(lugares)
+    }
+  }, [lugares])
+
+  // Guardar actividades
   useEffect(() => {
     if (!cargando && actividades.length > 0) {
-      console.log('💾 useEffect detectó cambio en actividades, guardando...', actividades.length)
-      guardarEnServidor(actividades)
+      console.log('💾 Actividades actualizadas en memoria:', actividades.length)
+      // En producción con Google Sheets:
+      // const sheetsService = new SheetsService()
+      // await sheetsService.updateActividades(actividades)
     }
   }, [actividades, cargando])
 
@@ -355,20 +382,16 @@ function App() {
     setAdminAbierto(false)
   }
 
-  const cerrarBlog = () => {
-    setBlogAbierto(false)
-  }
-
   const cerrarSesion = () => {
     setAutenticado(false)
     setAdminAbierto(false)
-    setBlogAbierto(false)
+    setReservasAbierto(false)
   }
 
   const resetearActividades = async () => {
     if (confirm('¿Estás seguro de resetear las actividades a las predeterminadas?')) {
       setActividades(actividadesIniciales)
-      await guardarEnServidor(actividadesIniciales)
+      console.log('✅ Actividades reseteadas a valores iniciales')
       alert('Actividades reseteadas exitosamente')
     }
   }
@@ -417,6 +440,23 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault()
     
+    // Crear nueva reserva
+    const nuevaReserva = {
+      id: Date.now(),
+      actividadId: actividadSeleccionada.id,
+      nombre: formData.nombre,
+      email: formData.email,
+      telefono: formData.telefono,
+      cantidadPersonas: formData.cantidadPersonas,
+      mensaje: formData.mensaje,
+      estado: 'pendiente',
+      fechaReserva: new Date().toISOString()
+    }
+    
+    // Guardar reserva
+    setReservas(prev => [...prev, nuevaReserva])
+    console.log('✅ Reserva creada:', nuevaReserva)
+    
     // Construir el contenido del email
     const subject = `Reserva: ${actividadSeleccionada.titulo}`
     const body = `
@@ -443,6 +483,9 @@ ${formData.mensaje || 'Sin mensaje adicional'}
     // Abrir cliente de correo
     const mailtoLink = `mailto:nahueltrek@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
     window.location.href = mailtoLink
+    
+    // Mostrar mensaje de éxito
+    alert('✅ Reserva creada exitosamente\n\nLa reserva ha sido guardada y se abrirá tu cliente de correo para confirmar.')
     
     // Cerrar modal después de un pequeño delay
     setTimeout(() => {
@@ -487,7 +530,7 @@ ${formData.mensaje || 'Sin mensaje adicional'}
           </div>
         </div>
       )}
-      
+
       <nav className="gradient-bg sticky-top" style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -510,6 +553,14 @@ ${formData.mensaje || 'Sin mensaje adicional'}
               border: '2px solid rgba(255,255,255,0.5)'
             }} 
           />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <span style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: 'bold',
+              color: 'white',
+              textShadow: '2px 2px 4px rgba(0,0,0,0.3)'
+            }}>NahuelTrek</span>
+          </div>
         </div>
         
         {/* Menú Desktop */}
@@ -523,18 +574,63 @@ ${formData.mensaje || 'Sin mensaje adicional'}
           }}>
             <li><a href="#inicio" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Inicio</a></li>
             <li><a href="#actividades" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Actividades</a></li>
-            <li><a href="#lugares" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Lugares</a></li>
             <li><a href="#ndr" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>NDR</a></li>
             <li><a href="#contacto" style={{ color: 'white', textDecoration: 'none', transition: 'opacity 0.3s' }}>Contacto</a></li>
           </ul>
 
-          {/* Botón Blog */}
+          {/* Botón Reservas */}
           {autenticado && (
             <button
-              onClick={() => setBlogAbierto(true)}
+              onClick={() => setReservasAbierto(true)}
               style={{
                 padding: '0.6rem 1.2rem',
-                background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+                background: reservas.filter(r => r.estado === 'pendiente').length > 0 
+                  ? 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)' 
+                  : 'linear-gradient(135deg, #2196f3 0%, #1976d2 100%)',
+                color: 'white',
+                border: '2px solid rgba(255,255,255,0.3)',
+                borderRadius: '8px',
+                fontSize: '0.9rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                backdropFilter: 'blur(10px)',
+                transition: 'all 0.3s ease',
+                position: 'relative'
+              }}
+              onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
+              onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+            >
+              📅 Reservas {reservas.length > 0 && `(${reservas.length})`}
+              {reservas.filter(r => r.estado === 'pendiente').length > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-5px',
+                  right: '-5px',
+                  backgroundColor: '#ff4444',
+                  color: 'white',
+                  borderRadius: '50%',
+                  width: '20px',
+                  height: '20px',
+                  fontSize: '0.7rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: 'bold',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                }}>
+                  {reservas.filter(r => r.estado === 'pendiente').length}
+                </span>
+              )}
+            </button>
+          )}
+
+          {/* Botón Destinos */}
+          {autenticado && (
+            <button
+              onClick={() => setDestinosAbierto(true)}
+              style={{
+                padding: '0.6rem 1.2rem',
+                background: 'linear-gradient(135deg, #9c27b0 0%, #7b1fa2 100%)',
                 color: 'white',
                 border: '2px solid rgba(255,255,255,0.3)',
                 borderRadius: '8px',
@@ -547,7 +643,7 @@ ${formData.mensaje || 'Sin mensaje adicional'}
               onMouseOver={(e) => e.target.style.transform = 'scale(1.05)'}
               onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
             >
-              📍 Blog Lugares
+              📍 Destinos
             </button>
           )}
 
@@ -752,25 +848,6 @@ ${formData.mensaje || 'Sin mensaje adicional'}
               onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
             >
               Actividades
-            </a>
-          </li>
-          <li>
-            <a 
-              href="#lugares" 
-              onClick={() => setMenuAbierto(false)}
-              style={{ 
-                color: 'white', 
-                textDecoration: 'none', 
-                fontSize: '1.2rem',
-                display: 'block',
-                padding: '0.5rem',
-                borderLeft: '3px solid transparent',
-                transition: 'all 0.3s'
-              }}
-              onMouseOver={(e) => e.target.style.borderLeft = '3px solid #81c784'}
-              onMouseOut={(e) => e.target.style.borderLeft = '3px solid transparent'}
-            >
-              Lugares
             </a>
           </li>
           <li>
@@ -1014,140 +1091,6 @@ ${formData.mensaje || 'Sin mensaje adicional'}
         </div>
       </section>
 
-      {/* Sección de Lugares / Blog */}
-      <section id="lugares" className="container my-5 py-4">
-        <div className="text-center mb-5">
-          <h2 className="display-4 mb-3" style={{ color: '#1e3a5f', fontWeight: 'bold' }}>
-            📍 Lugares que Debes Conocer
-          </h2>
-          <p className="lead text-muted">
-            Descubre los mejores destinos para tus aventuras en la naturaleza
-          </p>
-        </div>
-
-        {lugares.length === 0 ? (
-          <div className="text-center text-muted py-5">
-            <p className="fs-5">No hay lugares publicados aún</p>
-            {autenticado && (
-              <button 
-                className="btn btn-primary mt-3"
-                onClick={() => setBlogAbierto(true)}
-              >
-                📍 Agregar Primer Lugar
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="row g-4">
-            {lugares
-              .sort((a, b) => (b.destacado ? 1 : 0) - (a.destacado ? 1 : 0))
-              .map((lugar) => (
-                <div key={lugar.id} className="col-md-6 col-lg-4">
-                  <div 
-                    className="card h-100 shadow-sm hover-card"
-                    style={{ 
-                      borderRadius: '12px',
-                      overflow: 'hidden',
-                      transition: 'all 0.3s ease'
-                    }}
-                  >
-                    {lugar.destacado && (
-                      <div 
-                        style={{
-                          position: 'absolute',
-                          top: '10px',
-                          right: '10px',
-                          background: 'linear-gradient(135deg, #ff6b35, #f7931e)',
-                          color: 'white',
-                          padding: '5px 12px',
-                          borderRadius: '20px',
-                          fontSize: '0.85rem',
-                          fontWeight: 'bold',
-                          zIndex: 1,
-                          boxShadow: '0 2px 8px rgba(0,0,0,0.2)'
-                        }}
-                      >
-                        ⭐ Destacado
-                      </div>
-                    )}
-                    
-                    {lugar.imagenes[0] && (
-                      <div style={{ position: 'relative', overflow: 'hidden', height: '200px' }}>
-                        <img
-                          src={lugar.imagenes[0]}
-                          alt={lugar.titulo}
-                          style={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            transition: 'transform 0.3s ease'
-                          }}
-                          onMouseOver={(e) => e.target.style.transform = 'scale(1.1)'}
-                          onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
-                        />
-                      </div>
-                    )}
-                    
-                    <div className="card-body">
-                      <div className="mb-2">
-                        <span 
-                          className="badge"
-                          style={{
-                            background: '#1e3a5f',
-                            color: 'white',
-                            padding: '4px 10px',
-                            borderRadius: '12px',
-                            fontSize: '0.75rem'
-                          }}
-                        >
-                          {lugar.categoria}
-                        </span>
-                      </div>
-                      
-                      <h5 className="card-title mb-2" style={{ color: '#1e3a5f' }}>
-                        {lugar.titulo}
-                      </h5>
-                      
-                      <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>
-                        {lugar.descripcion}
-                      </p>
-                      
-                      {lugar.ubicacion && (
-                        <p className="text-muted mb-2" style={{ fontSize: '0.85rem' }}>
-                          📍 {lugar.ubicacion}
-                        </p>
-                      )}
-
-                      {/* Mostrar actividades relacionadas */}
-                      {(() => {
-                        const actividadesRelacionadas = actividades.filter(a => a.lugarId === lugar.id)
-                        return actividadesRelacionadas.length > 0 ? (
-                          <div className="mt-2 mb-2">
-                            <small className="text-muted">
-                              🥾 {actividadesRelacionadas.length} {actividadesRelacionadas.length === 1 ? 'actividad' : 'actividades'}
-                            </small>
-                          </div>
-                        ) : null
-                      })()}
-                      
-                      {lugar.contenido && (
-                        <button 
-                          className="btn btn-sm btn-outline-primary mt-2"
-                          onClick={() => {
-                            alert(`${lugar.titulo}\n\n${lugar.contenido}`)
-                          }}
-                        >
-                          Leer más →
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-          </div>
-        )}
-      </section>
-
       {/* Sección NDR */}
       <section id="ndr" className="container my-5 py-4">
         <div className="bg-light rounded-3 p-4 p-md-5">
@@ -1306,10 +1249,467 @@ ${formData.mensaje || 'Sin mensaje adicional'}
         </div>
       </section>
 
+      {/* Sección de Contacto */}
+      <section id="contacto" className="container my-5 py-4">
+        <div className="text-center mb-5">
+          <h2 className="display-4 mb-3" style={{ color: '#1e3a5f', fontWeight: 'bold' }}>
+            📞 Contacto
+          </h2>
+          <p className="lead text-muted">
+            ¿Tienes alguna consulta? Completa el formulario y te responderemos pronto
+          </p>
+        </div>
+
+        <div className="row justify-content-center">
+          <div className="col-lg-8">
+            <div className="card shadow-sm" style={{ borderRadius: '12px', border: 'none' }}>
+              <div className="card-body p-4">
+                <form onSubmit={async (e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.target)
+                  const data = {
+                    nombre: formData.get('nombre'),
+                    telefono: formData.get('telefono'),
+                    email: formData.get('email'),
+                    destino: formData.get('destino'),
+                    fecha: formData.get('fecha'),
+                    cantidadPersonas: formData.get('cantidadPersonas'),
+                    cantidadDias: formData.get('cantidadDias'),
+                    requiereHospedaje: formData.get('requiereHospedaje') === 'si',
+                    detalles: formData.get('detalles') || ''
+                  }
+                  
+                  // Enviar email
+                  const emailBody = `
+Nueva Consulta de Contacto - Nahueltrek
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 DATOS DEL CLIENTE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Nombre: ${data.nombre}
+Teléfono: ${data.telefono}
+Email: ${data.email}
+
+🗺️ DETALLES DEL VIAJE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Destino: ${data.destino}
+Fecha: ${new Date(data.fecha).toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Cantidad de personas: ${data.cantidadPersonas}
+Cantidad de días: ${data.cantidadDias}
+Requiere hospedaje: ${data.requiereHospedaje ? '✅ Sí' : '❌ No'}
+
+${data.detalles ? `📝 DETALLES ADICIONALES\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${data.detalles}\n\n` : ''}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Enviado desde: www.nahueltrek.com
+Fecha de envío: ${new Date().toLocaleString('es-ES')}
+                  `
+                  
+                  // Crear enlace mailto
+                  const mailtoLink = `mailto:nahueltrek@gmail.com?subject=Nueva Consulta: ${data.nombre} - ${data.destino}&body=${encodeURIComponent(emailBody)}`
+                  
+                  // Abrir cliente de correo
+                  window.open(mailtoLink, '_blank')
+                  
+                  // Mostrar modal de confirmación
+                  setMostrarModalContacto(true)
+                  e.target.reset()
+                }}>
+                  <div className="row g-3">
+                    {/* Nombre */}
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        👤 Nombre completo *
+                      </label>
+                      <input
+                        type="text"
+                        name="nombre"
+                        className="form-control"
+                        placeholder="Tu nombre"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Teléfono */}
+                    <div className="col-md-6">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        📱 Teléfono *
+                      </label>
+                      <input
+                        type="tel"
+                        name="telefono"
+                        className="form-control"
+                        placeholder="+56 9 1234 5678"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Email */}
+                    <div className="col-12">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        📧 Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        className="form-control"
+                        placeholder="tu@email.com"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Destino de Interés */}
+                    <div className="col-12">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        📍 Destino de interés *
+                      </label>
+                      <select
+                        name="destino"
+                        className="form-select"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      >
+                        <option value="">Selecciona un destino...</option>
+                        {lugares.map(lugar => (
+                          <option key={lugar.id} value={lugar.titulo}>
+                            {lugar.titulo}
+                          </option>
+                        ))}
+                        <option value="otro">Otro destino</option>
+                      </select>
+                    </div>
+
+                    {/* Fecha */}
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        📅 Fecha aproximada *
+                      </label>
+                      <input
+                        type="date"
+                        name="fecha"
+                        className="form-control"
+                        required
+                        min={new Date().toISOString().split('T')[0]}
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Cantidad de Personas */}
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        👥 Cant. personas *
+                      </label>
+                      <input
+                        type="number"
+                        name="cantidadPersonas"
+                        className="form-control"
+                        placeholder="1"
+                        min="1"
+                        max="50"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Cantidad de Días */}
+                    <div className="col-md-4">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        🗓️ Cant. días *
+                      </label>
+                      <input
+                        type="number"
+                        name="cantidadDias"
+                        className="form-control"
+                        placeholder="1"
+                        min="1"
+                        max="30"
+                        required
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Requiere Hospedaje */}
+                    <div className="col-12">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        🏨 ¿Requiere hospedaje? *
+                      </label>
+                      <div className="d-flex gap-3">
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="requiereHospedaje"
+                            id="hospedajeSi"
+                            value="si"
+                            required
+                          />
+                          <label className="form-check-label" htmlFor="hospedajeSi">
+                            Sí
+                          </label>
+                        </div>
+                        <div className="form-check">
+                          <input
+                            className="form-check-input"
+                            type="radio"
+                            name="requiereHospedaje"
+                            id="hospedajeNo"
+                            value="no"
+                            required
+                          />
+                          <label className="form-check-label" htmlFor="hospedajeNo">
+                            No
+                          </label>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Detalles Adicionales */}
+                    <div className="col-12">
+                      <label className="form-label fw-bold" style={{ color: '#1e3a5f' }}>
+                        📝 Detalles adicionales
+                      </label>
+                      <textarea
+                        name="detalles"
+                        className="form-control"
+                        rows="4"
+                        placeholder="Cuéntanos más sobre tu viaje, preferencias, necesidades especiales, etc."
+                        style={{ borderRadius: '8px', padding: '0.6rem' }}
+                      />
+                    </div>
+
+                    {/* Botón Enviar */}
+                    <div className="col-12 text-center mt-4">
+                      <button
+                        type="submit"
+                        className="btn btn-lg"
+                        style={{
+                          background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '25px',
+                          padding: '0.8rem 3rem',
+                          fontSize: '1.1rem',
+                          fontWeight: 'bold',
+                          boxShadow: '0 4px 15px rgba(30, 58, 95, 0.3)',
+                          transition: 'all 0.3s'
+                        }}
+                        onMouseOver={(e) => {
+                          e.target.style.transform = 'translateY(-2px)'
+                          e.target.style.boxShadow = '0 6px 20px rgba(30, 58, 95, 0.4)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.target.style.transform = 'translateY(0)'
+                          e.target.style.boxShadow = '0 4px 15px rgba(30, 58, 95, 0.3)'
+                        }}
+                      >
+                        📨 Enviar consulta
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
-      <footer id="contacto" className="bg-dark text-white text-center py-4 mt-5">
+      <footer className="bg-dark text-white py-5 mt-5">
         <div className="container">
-          <p className="mb-0">© 2025 Nahueltrek - Todos los derechos reservados</p>
+          <div className="row g-4">
+            {/* Columna 1: Información de Contacto */}
+            <div className="col-md-4">
+              <h5 className="mb-3" style={{ color: '#81c784', fontWeight: 'bold' }}>📍 Nahueltrek</h5>
+              <p style={{ lineHeight: '1.8', color: '#ccc' }}>
+                Turismo de aventura y trekking en Chile. 
+                Conectando personas con la naturaleza.
+              </p>
+              <div style={{ marginTop: '1rem' }}>
+                <p style={{ margin: '0.5rem 0', color: '#ccc' }}>
+                  <strong style={{ color: 'white' }}>📱 WhatsApp:</strong>{' '}
+                  <a 
+                    href="https://wa.me/56994543632" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{ color: '#81c784', textDecoration: 'none' }}
+                    onMouseOver={(e) => e.target.style.textDecoration = 'underline'}
+                    onMouseOut={(e) => e.target.style.textDecoration = 'none'}
+                  >
+                    +56 9 9454 3632
+                  </a>
+                </p>
+              </div>
+            </div>
+
+            {/* Columna 2: Enlaces Rápidos */}
+            <div className="col-md-4">
+              <h5 className="mb-3" style={{ color: '#81c784', fontWeight: 'bold' }}>🔗 Enlaces</h5>
+              <ul style={{ listStyle: 'none', padding: 0 }}>
+                <li style={{ marginBottom: '0.8rem' }}>
+                  <a 
+                    href="#inicio" 
+                    style={{ color: '#ccc', textDecoration: 'none', transition: 'color 0.3s' }}
+                    onMouseOver={(e) => e.target.style.color = '#81c784'}
+                    onMouseOut={(e) => e.target.style.color = '#ccc'}
+                  >
+                    Inicio
+                  </a>
+                </li>
+                <li style={{ marginBottom: '0.8rem' }}>
+                  <a 
+                    href="#actividades" 
+                    style={{ color: '#ccc', textDecoration: 'none', transition: 'color 0.3s' }}
+                    onMouseOver={(e) => e.target.style.color = '#81c784'}
+                    onMouseOut={(e) => e.target.style.color = '#ccc'}
+                  >
+                    Actividades
+                  </a>
+                </li>
+                <li style={{ marginBottom: '0.8rem' }}>
+                  <a 
+                    href="#ndr" 
+                    style={{ color: '#ccc', textDecoration: 'none', transition: 'color 0.3s' }}
+                    onMouseOver={(e) => e.target.style.color = '#81c784'}
+                    onMouseOut={(e) => e.target.style.color = '#ccc'}
+                  >
+                    No Deje Rastro
+                  </a>
+                </li>
+                <li style={{ marginBottom: '0.8rem' }}>
+                  <a 
+                    href="#contacto" 
+                    style={{ color: '#ccc', textDecoration: 'none', transition: 'color 0.3s' }}
+                    onMouseOver={(e) => e.target.style.color = '#81c784'}
+                    onMouseOut={(e) => e.target.style.color = '#ccc'}
+                  >
+                    Contacto
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Columna 3: Redes Sociales */}
+            <div className="col-md-4">
+              <h5 className="mb-3" style={{ color: '#81c784', fontWeight: 'bold' }}>📱 Síguenos</h5>
+              <p style={{ color: '#ccc', marginBottom: '1.5rem' }}>
+                Mantente al día con nuestras aventuras
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com/nahueltrek"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.8rem',
+                    padding: '0.8rem 1rem',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    color: 'white',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#E4405F'
+                    e.currentTarget.style.transform = 'translateX(5px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>📷</span>
+                  <div>
+                    <div style={{ fontWeight: 'bold' }}>Instagram</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc' }}>@nahueltrek</div>
+                  </div>
+                </a>
+
+                {/* Facebook */}
+                <a
+                  href="https://web.facebook.com/nahueltrek"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.8rem',
+                    padding: '0.8rem 1rem',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    color: 'white',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#1877F2'
+                    e.currentTarget.style.transform = 'translateX(5px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>👥</span>
+                  <div>
+                    <div style={{ fontWeight: 'bold' }}>Facebook</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc' }}>nahueltrek</div>
+                  </div>
+                </a>
+
+                {/* WhatsApp */}
+                <a
+                  href="https://wa.me/56994543632"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.8rem',
+                    padding: '0.8rem 1rem',
+                    backgroundColor: 'rgba(255,255,255,0.1)',
+                    borderRadius: '8px',
+                    textDecoration: 'none',
+                    color: 'white',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = '#25D366'
+                    e.currentTarget.style.transform = 'translateX(5px)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                    e.currentTarget.style.transform = 'translateX(0)'
+                  }}
+                >
+                  <span style={{ fontSize: '1.5rem' }}>💬</span>
+                  <div>
+                    <div style={{ fontWeight: 'bold' }}>WhatsApp</div>
+                    <div style={{ fontSize: '0.85rem', color: '#ccc' }}>Contáctanos directo</div>
+                  </div>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Copyright */}
+          <div style={{
+            marginTop: '3rem',
+            paddingTop: '2rem',
+            borderTop: '1px solid rgba(255,255,255,0.1)',
+            textAlign: 'center'
+          }}>
+            <p style={{ margin: 0, color: '#999', fontSize: '0.9rem' }}>
+              © 2025 Nahueltrek - Todos los derechos reservados
+            </p>
+            <p style={{ margin: '0.5rem 0 0 0', color: '#666', fontSize: '0.85rem' }}>
+              Hecho con 💚 para los amantes de la naturaleza
+            </p>
+          </div>
         </div>
       </footer>
 
@@ -1734,6 +2134,127 @@ ${formData.mensaje || 'Sin mensaje adicional'}
         </div>
       )}
 
+      {/* Modal de Confirmación de Contacto */}
+      {mostrarModalContacto && (
+        <div
+          onClick={() => setMostrarModalContacto(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100vh',
+            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+            zIndex: 2500,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            padding: '1rem',
+            animation: 'fadeIn 0.3s ease'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '20px',
+              padding: '2.5rem',
+              maxWidth: '500px',
+              width: '100%',
+              textAlign: 'center',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+              animation: 'slideUp 0.3s ease'
+            }}
+          >
+            {/* Icono de éxito */}
+            <div style={{
+              width: '80px',
+              height: '80px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)',
+              margin: '0 auto 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '3rem',
+              animation: 'scaleIn 0.5s ease'
+            }}>
+              ✓
+            </div>
+
+            <h2 style={{
+              color: '#1e3a5f',
+              marginBottom: '1rem',
+              fontSize: '1.8rem',
+              fontWeight: 'bold'
+            }}>
+              ¡Consulta Enviada!
+            </h2>
+
+            <p style={{
+              color: '#666',
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+              marginBottom: '2rem'
+            }}>
+              Tu consulta ha sido enviada exitosamente. 
+              Nos pondremos en contacto contigo pronto.
+            </p>
+
+            <button
+              onClick={() => setMostrarModalContacto(false)}
+              style={{
+                padding: '0.8rem 2rem',
+                background: 'linear-gradient(135deg, #1e3a5f 0%, #2d5a8f 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '25px',
+                fontSize: '1rem',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                transition: 'all 0.3s',
+                boxShadow: '0 4px 15px rgba(30, 58, 95, 0.3)'
+              }}
+              onMouseOver={(e) => {
+                e.target.style.transform = 'translateY(-2px)'
+                e.target.style.boxShadow = '0 6px 20px rgba(30, 58, 95, 0.4)'
+              }}
+              onMouseOut={(e) => {
+                e.target.style.transform = 'translateY(0)'
+                e.target.style.boxShadow = '0 4px 15px rgba(30, 58, 95, 0.3)'
+              }}
+            >
+              Cerrar
+            </button>
+          </div>
+
+          <style>{`
+            @keyframes fadeIn {
+              from { opacity: 0; }
+              to { opacity: 1; }
+            }
+            @keyframes slideUp {
+              from { 
+                opacity: 0;
+                transform: translateY(30px);
+              }
+              to { 
+                opacity: 1;
+                transform: translateY(0);
+              }
+            }
+            @keyframes scaleIn {
+              from { 
+                transform: scale(0);
+              }
+              to { 
+                transform: scale(1);
+              }
+            }
+          `}</style>
+        </div>
+      )}
+
       {/* Panel de Administración */}
       {adminAbierto && autenticado && (
         <Admin 
@@ -1750,15 +2271,22 @@ ${formData.mensaje || 'Sin mensaje adicional'}
         />
       )}
 
-      {/* Panel de Blog de Lugares */}
-      {blogAbierto && autenticado && (
-        <BlogLugares 
+      {/* Panel de Gestión de Reservas */}
+      {reservasAbierto && autenticado && (
+        <Reservas 
+          reservas={reservas}
+          setReservas={setReservas}
+          actividades={actividades}
+          onCerrar={() => setReservasAbierto(false)}
+        />
+      )}
+
+      {/* Panel de Gestión de Destinos */}
+      {destinosAbierto && autenticado && (
+        <Destinos 
           lugares={lugares}
           setLugares={setLugares}
-          onCerrar={cerrarBlog}
-          onActualizarImagenes={() => {
-            setImagenesVersion(prev => prev + 1)
-          }}
+          onCerrar={() => setDestinosAbierto(false)}
         />
       )}
     </div>

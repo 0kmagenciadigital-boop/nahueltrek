@@ -1,6 +1,6 @@
 # 🌐 Integración con Google Services - NahuelTrek
 
-Este documento detalla la implementación completa de 4 integraciones con Google para reemplazar dependencias de PHP y mejorar funcionalidades.
+Este documento detalla la implementación completa de 5 integraciones con Google para reemplazar dependencias de PHP y mejorar funcionalidades.
 
 ## 📋 Tabla de Contenidos
 
@@ -9,8 +9,9 @@ Este documento detalla la implementación completa de 4 integraciones con Google
 3. [Google Drive - Almacenamiento de Imágenes](#google-drive)
 4. [Google Sheets - Base de Datos](#google-sheets)
 5. [Google Maps - Ubicaciones](#google-maps)
-6. [Google Forms - Reservaciones](#google-forms)
-7. [Despliegue](#despliegue)
+6. [Google Calendar - Eventos y Reservas](#google-calendar)
+7. [Google Forms - Reservaciones](#google-forms)
+8. [Despliegue](#despliegue)
 
 ---
 
@@ -27,6 +28,8 @@ Este documento detalla la implementación completa de 4 integraciones con Google
 ✅ **Almacenamiento ilimitado** - 15GB gratis en Google Drive  
 ✅ **Base de datos robusta** - Google Sheets como backend  
 ✅ **Mapas interactivos** - Ubicaciones visuales con Street View  
+✅ **Calendario sincronizado** - Gestión automática de eventos y reservas  
+✅ **Emails automáticos** - Invitaciones de calendario a clientes  
 ✅ **Sistema de reservas** - Google Forms con notificaciones automáticas  
 ✅ **Acceso desde cualquier lugar** - Cloud-first architecture  
 ✅ **Backups automáticos** - Google maneja la redundancia  
@@ -53,6 +56,7 @@ Buscar y habilitar las siguientes APIs:
 - ✅ **Google Sheets API** (para base de datos)
 - ✅ **Google Maps JavaScript API** (para mapas)
 - ✅ **Google Maps Geocoding API** (para convertir direcciones a coordenadas)
+- ✅ **Google Calendar API** (para eventos y reservas)
 
 Para cada una:
 1. Buscar el nombre en la biblioteca
@@ -248,9 +252,21 @@ Los componentes `Admin.jsx` y `BlogLugares.jsx` ya están actualizados para usar
 
 4. Copiar el ID y agregar a `.env`: `VITE_GOOGLE_SHEETS_LUGARES_ID=[ID]`
 
+##### Hoja 3: Reservas
+
+1. Crear otra hoja: **Hoja de cálculo en blanco** → Nombre: `NahuelTrek-Reservas`
+2. Renombrar la primera pestaña a `Reservas`
+3. Crear encabezados en la fila 1:
+
+| A | B | C | D | E | F | G | H | I |
+|---|---|---|---|---|---|---|---|---|
+| id | actividadId | actividadTitulo | nombre | email | telefono | cantidadPersonas | mensaje | fechaReserva |
+
+4. Copiar el ID y agregar a `.env`: `VITE_GOOGLE_SHEETS_RESERVAS_ID=[ID]`
+
 #### 2. Compartir Hojas con la Aplicación
 
-Para cada hoja:
+Para cada una de las 3 hojas (Actividades, Lugares, Reservas):
 1. Clic en **Compartir** (botón verde arriba derecha)
 2. En "Agregar personas y grupos", pegar el email de tu cuenta de servicio  
    (Está en `credentials.json` → `client_email`)
@@ -291,6 +307,20 @@ const lugares = await SheetsService.getLugares()
 const nuevoLugar = await SheetsService.createLugar({ titulo: '...', ... })
 await SheetsService.updateLugar(id, { titulo: '...' })
 await SheetsService.deleteLugar(id)
+
+// CRUD Reservas
+const reservas = await SheetsService.getReservas()
+const nuevaReserva = await SheetsService.createReserva({
+  actividadId: 'act_123',
+  actividadTitulo: 'Trekking Volcán Villarrica',
+  nombre: 'Juan Pérez',
+  email: 'juan@email.com',
+  telefono: '+56912345678',
+  cantidadPersonas: 2,
+  mensaje: 'Consulta por descuentos grupales'
+})
+const reservasPorActividad = await SheetsService.getReservasByActividad('act_123')
+await SheetsService.deleteReserva(id)
 ```
 
 ### Ventajas sobre JSON Files:
@@ -300,6 +330,7 @@ await SheetsService.deleteLugar(id)
 - ✅ **Sin servidor**: No necesitas PHP ni base de datos tradicional
 - ✅ **Escalable**: Soporta miles de filas sin problemas
 - ✅ **Exportable**: Descarga como CSV, Excel, PDF
+- ✅ **Notificaciones**: Configura alertas cuando hay nuevas reservas
 
 ---
 
@@ -393,6 +424,158 @@ Las tarjetas de lugares ahora muestran:
 - **Mapa pequeño** con la ubicación
 - **Botón "Ver en Google Maps"** que abre Google Maps en nueva pestaña
 - **Dirección** debajo del título
+
+---
+
+## 📅 Google Calendar - Gestión de Eventos y Reservas
+
+### Configuración Inicial
+
+#### 1. Habilitar Google Calendar API
+
+Ya debería estar habilitada si seguiste los pasos iniciales, pero verifica:
+
+1. **Google Cloud Console** → **APIs y servicios** → **Biblioteca**
+2. Buscar **"Google Calendar API"**
+3. Clic en **"HABILITAR"** (si no está habilitada)
+
+#### 2. Crear Calendario Dedicado (Opcional pero Recomendado)
+
+Para tener un calendario separado solo para NahuelTrek:
+
+1. Ir a [Google Calendar](https://calendar.google.com/)
+2. Lado izquierdo → Junto a "Otros calendarios" → Clic en **"+"**
+3. Seleccionar **"Crear nuevo calendario"**
+4. Completar:
+   - **Nombre**: `NahuelTrek - Actividades y Reservas`
+   - **Descripción**: `Calendario de trekking y outdoor`
+   - **Zona horaria**: `(GMT-03:00) Santiago`
+5. Clic en **"Crear calendario"**
+
+6. **Obtener el Calendar ID**:
+   - En la lista de calendarios, busca el recién creado
+   - Clic en los 3 puntos → **"Configuración y uso compartido"**
+   - Bajar hasta **"Integrar calendario"**
+   - Copiar el **ID del calendario** (algo como: `abc123@group.calendar.google.com`)
+   - Agregar a `.env`: `VITE_GOOGLE_CALENDAR_ID=abc123@group.calendar.google.com`
+
+7. **Hacer el calendario público** (para que los clientes puedan verlo):
+   - En la misma página de configuración
+   - Sección **"Permisos de acceso"**
+   - Marcar: ☑️ **"Hacer disponible públicamente"**
+   - Permisos: **"Ver todos los detalles del evento"**
+   - Guardar
+
+### Implementación
+
+El servicio está en `src/services/CalendarService.js`:
+
+#### API del Servicio:
+
+```javascript
+import CalendarService from './services/CalendarService'
+
+// Inicializar
+await CalendarService.initialize()
+
+// Crear evento de actividad
+const resultado = await CalendarService.crearEventoActividad({
+  fecha: '2025-12-15',
+  titulo: 'Trekking Volcán Villarrica',
+  descripcion: 'Ascenso guiado',
+  duracion: '8 horas',
+  dificultad: 'Alta',
+  precio: '$65.000',
+  incluye: 'Guía, equipo técnico, almuerzo'
+})
+// Retorna: { success: true, eventId: '...', htmlLink: '...' }
+
+// Crear evento de reserva (automático cuando cliente reserva)
+await CalendarService.crearEventoReserva(reserva, actividad)
+// Envía email automático al cliente con invitación
+
+// Actualizar evento
+await CalendarService.actualizarEventoActividad(eventId, actividadActualizada)
+
+// Eliminar evento
+await CalendarService.eliminarEvento(eventId)
+
+// Verificar disponibilidad de fecha
+const disponibilidad = await CalendarService.verificarDisponibilidad('2025-12-15')
+// Retorna: { disponible: true, eventos: 2, reservas: 1, detalles: [...] }
+
+// Obtener eventos en un rango
+const eventos = await CalendarService.obtenerEventos(
+  new Date('2025-12-01'),
+  new Date('2025-12-31')
+)
+
+// Obtener URL pública del calendario
+const urlPublica = CalendarService.getCalendarPublicUrl()
+// Retorna: https://calendar.google.com/calendar/embed?src=...
+```
+
+### Características
+
+#### ✅ Eventos de Actividades
+- Se crean automáticamente cuando agregas una actividad en el admin
+- Color verde 🟢
+- Incluyen toda la info: lugar, duración, dificultad, precio
+- Recordatorio: 1 día antes (email) + 1 hora antes (popup)
+
+#### ✅ Eventos de Reservas
+- Se crean automáticamente cuando un cliente reserva
+- Color rojo 🔴
+- Incluyen datos del cliente: nombre, email, teléfono, personas
+- **Envían email automático** al cliente con la invitación
+- El cliente puede agregar el evento a su propio calendario
+- Recordatorio: 1 día antes + 2 horas antes
+
+#### ✅ Control de Disponibilidad
+- Verifica cuántas reservas hay por fecha
+- Máximo 3 reservas por actividad/día
+- Evita sobrecupo automáticamente
+
+#### ✅ Sincronización
+- Si editas una actividad, el evento se actualiza automáticamente
+- Si eliminas una actividad, el evento se borra del calendario
+- Todo sincronizado en tiempo real
+
+### Integración en el Sitio Web
+
+#### Opción 1: Embed del Calendario (Recomendado)
+
+Agrega el calendario en tu página:
+
+```html
+<iframe 
+  src="https://calendar.google.com/calendar/embed?src=TU_CALENDAR_ID&ctz=America/Santiago"
+  style="border: 0" 
+  width="800" 
+  height="600" 
+  frameborder="0" 
+  scrolling="no">
+</iframe>
+```
+
+#### Opción 2: Botón "Ver Calendario"
+
+```javascript
+<button onClick={() => window.open(CalendarService.getCalendarPublicUrl(), '_blank')}>
+  📅 Ver Calendario de Actividades
+</button>
+```
+
+### Ventajas del Calendar
+
+- ✅ **Emails automáticos** a clientes con invitación
+- ✅ **Sincronización** con calendarios personales (Google, Outlook, Apple)
+- ✅ **Control de disponibilidad** automático
+- ✅ **Recordatorios** configurables
+- ✅ **Vista pública** para que clientes vean fechas disponibles
+- ✅ **Gestión centralizada** de todos los eventos
+- ✅ **Exportable** a otros calendarios
+- ✅ **Notificaciones móviles** via app de Google Calendar
 
 ---
 
@@ -732,14 +915,23 @@ Visitar `https://nahueltrek.0km.app` y verificar:
 
 ## 🎉 Conclusión
 
-Con estas integraciones has logrado:
+Con estas 5 integraciones has logrado:
 
 ✅ **Eliminar dependencias de PHP** - Todo en el cloud  
 ✅ **Sistema robusto y escalable** - Aprovechando infraestructura de Google  
 ✅ **Administración simplificada** - Edita datos directamente en Sheets  
 ✅ **Experiencia de usuario mejorada** - Mapas interactivos, formularios profesionales  
+✅ **Calendario sincronizado** - Eventos automáticos y emails a clientes  
+✅ **Control de disponibilidad** - Evita sobrecupos automáticamente  
 ✅ **Costo cero en backend** - Solo pagas hosting del frontend  
 ✅ **Backups automáticos** - Google maneja todo  
 ✅ **Accesible desde cualquier lugar** - Cloud-first  
+
+**🎯 Integraciones Implementadas:**
+1. 📁 **Google Drive** - Almacenamiento de imágenes
+2. 📊 **Google Sheets** - Base de datos (Actividades, Lugares, Reservas)
+3. 🗺️ **Google Maps** - Ubicaciones interactivas
+4. 📅 **Google Calendar** - Gestión de eventos y reservas
+5. 📝 **Google Forms** - Sistema de reservaciones
 
 **¡Tu blog de trekking ahora es profesional y escalable! 🏔️✨**

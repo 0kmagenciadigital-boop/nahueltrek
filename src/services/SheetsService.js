@@ -11,6 +11,7 @@ class SheetsService {
     this.sheets = null
     this.actividadesSheetId = import.meta.env.VITE_GOOGLE_SHEETS_ACTIVIDADES_ID
     this.lugaresSheetId = import.meta.env.VITE_GOOGLE_SHEETS_LUGARES_ID
+    this.reservasSheetId = import.meta.env.VITE_GOOGLE_SHEETS_RESERVAS_ID
     this.initialized = false
     this.authClient = null
   }
@@ -440,6 +441,125 @@ class SheetsService {
       return { success: true }
     } catch (error) {
       console.error('❌ Error eliminando lugar:', error)
+      throw error
+    }
+  }
+
+  /**
+   * RESERVAS - CRUD Operations
+   */
+
+  async getReservas() {
+    try {
+      if (!this.isReady()) {
+        throw new Error('Google Sheets no inicializado')
+      }
+
+      const response = await this.sheets.spreadsheets.values.get({
+        spreadsheetId: this.reservasSheetId,
+        range: 'Reservas!A2:I'
+      })
+
+      const rows = response.data.values || []
+      
+      return rows.map(row => ({
+        id: row[0] || '',
+        actividadId: row[1] || '',
+        actividadTitulo: row[2] || '',
+        nombre: row[3] || '',
+        email: row[4] || '',
+        telefono: row[5] || '',
+        cantidadPersonas: parseInt(row[6]) || 1,
+        mensaje: row[7] || '',
+        fechaReserva: row[8] || new Date().toISOString()
+      }))
+    } catch (error) {
+      console.error('❌ Error obteniendo reservas:', error)
+      throw error
+    }
+  }
+
+  async createReserva(reserva) {
+    try {
+      if (!this.isReady()) {
+        throw new Error('Google Sheets no inicializado')
+      }
+
+      const id = `reserva_${Date.now()}`
+      const row = [
+        id,
+        reserva.actividadId || '',
+        reserva.actividadTitulo || '',
+        reserva.nombre,
+        reserva.email,
+        reserva.telefono,
+        reserva.cantidadPersonas || 1,
+        reserva.mensaje || '',
+        new Date().toISOString()
+      ]
+
+      await this.sheets.spreadsheets.values.append({
+        spreadsheetId: this.reservasSheetId,
+        range: 'Reservas!A:I',
+        valueInputOption: 'USER_ENTERED',
+        requestBody: {
+          values: [row]
+        }
+      })
+
+      console.log('✅ Reserva creada:', id)
+      return { ...reserva, id, fechaReserva: row[8] }
+    } catch (error) {
+      console.error('❌ Error creando reserva:', error)
+      throw error
+    }
+  }
+
+  async getReservasByActividad(actividadId) {
+    try {
+      const todasReservas = await this.getReservas()
+      return todasReservas.filter(r => r.actividadId === actividadId)
+    } catch (error) {
+      console.error('❌ Error obteniendo reservas por actividad:', error)
+      throw error
+    }
+  }
+
+  async deleteReserva(id) {
+    try {
+      if (!this.isReady()) {
+        throw new Error('Google Sheets no inicializado')
+      }
+
+      const reservas = await this.getReservas()
+      const index = reservas.findIndex(r => r.id === id)
+      
+      if (index === -1) {
+        throw new Error('Reserva no encontrada')
+      }
+
+      const rowNumber = index + 2
+
+      await this.sheets.spreadsheets.batchUpdate({
+        spreadsheetId: this.reservasSheetId,
+        requestBody: {
+          requests: [{
+            deleteDimension: {
+              range: {
+                sheetId: 0,
+                dimension: 'ROWS',
+                startIndex: rowNumber - 1,
+                endIndex: rowNumber
+              }
+            }
+          }]
+        }
+      })
+
+      console.log('🗑️ Reserva eliminada:', id)
+      return { success: true }
+    } catch (error) {
+      console.error('❌ Error eliminando reserva:', error)
       throw error
     }
   }

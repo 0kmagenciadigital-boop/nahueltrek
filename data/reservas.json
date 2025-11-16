@@ -1,0 +1,57 @@
+[
+  {
+    "id": 1731780000000,
+    "actividadId": 101,
+    "nombre": "Juan Pérez González",
+    "email": "juan.perez@example.com",
+    "telefono": "+56 9 8765 4321",
+    "cantidadPersonas": "3",
+    "mensaje": "Me gustaría saber si es necesario llevar equipo especializado o si ustedes lo proporcionan. También nos interesa saber sobre el nivel de dificultad exacto para personas con experiencia media en trekking.",
+    "estado": "pendiente",
+    "fechaReserva": "2025-11-16T18:00:00.000Z"
+  },
+  {
+    "id": 1731783600000,
+    "actividadId": 102,
+    "nombre": "María Fernanda Silva",
+    "email": "mafe.silva@example.com",
+    "telefono": "+56 9 1234 5678",
+    "cantidadPersonas": "2",
+    "mensaje": "Es mi primera vez haciendo trekking. ¿Podrían recomendarme qué llevar?",
+    "estado": "confirmada",
+    "fechaReserva": "2025-11-16T17:00:00.000Z"
+  },
+  {
+    "id": 1731787200000,
+    "actividadId": 103,
+    "nombre": "Roberto Martínez",
+    "email": "r.martinez@example.com",
+    "telefono": "+56 9 9876 5432",
+    "cantidadPersonas": "5",
+    "mensaje": "Somos un grupo familiar con niños de 10 y 12 años. ¿Es apropiado para ellos?",
+    "estado": "pendiente",
+    "fechaReserva": "2025-11-16T16:30:00.000Z"
+  },
+  {
+    "id": 1731790800000,
+    "actividadId": 1,
+    "nombre": "Andrea Campos",
+    "email": "andrea.campos@example.com",
+    "telefono": "+56 9 5555 4444",
+    "cantidadPersonas": "1",
+    "mensaje": "",
+    "estado": "confirmada",
+    "fechaReserva": "2025-11-15T14:20:00.000Z"
+  },
+  {
+    "id": 1731794400000,
+    "actividadId": 104,
+    "nombre": "Carlos Muñoz",
+    "email": "carlos.munoz@example.com",
+    "telefono": "+56 9 3333 2222",
+    "cantidadPersonas": "4",
+    "mensaje": "Necesitamos transporte desde Angol. ¿Ofrecen ese servicio adicional?",
+    "estado": "cancelada",
+    "fechaReserva": "2025-11-14T10:15:00.000Z"
+  }
+]
